@@ -29,7 +29,7 @@ void vectorPush(Vector* vec, void* element)
 
 void* vectorGet(Vector* vec, size_t index)
 {
-    if (index < vec->size)
+    if (index < vec->capacity)
     {
         return vec->data[index];
     }

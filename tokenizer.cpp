@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include "node.h"
+#include "tree.h"
 #include "debug.h"
 
 Vector tokenizer()
@@ -34,6 +35,15 @@ Vector tokenizer()
         {
             currentToken->left = (Token*)vectorGet(&tokenVector, tokenVector.size - 1);
             ((Token*)vectorGet(&tokenVector, tokenVector.size - 1))->right = currentToken;
+        }
+        else
+        {
+            Token* serviceToken = (Token*)calloc(1, sizeof(Token));
+            assert(serviceToken);
+
+            currentToken->left = serviceToken;
+
+            serviceToken->value = dataArray;
         }
 
         if (isKeyWord(pointerToWord))
@@ -81,5 +91,6 @@ Operations isKeyWord(const char* const word)
     else if (!strcmp(word, keyCos)) return Cos;
     else if (!strcmp(word, keyTg )) return Tg ;
     else if (!strcmp(word, keyCtg)) return Ctg;
+    else if (!strcmp(word, keyIf )) return If ;
     else                            return NoOperation;
 }

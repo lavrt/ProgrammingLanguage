@@ -21,9 +21,4 @@ Vector tokenizer();
 size_t getFileSize(FILE* file);
 Operations isKeyWord(const char* const word);
 
-#define FREE(ptr_) \
-    do { free(ptr_); ptr_ = nullptr; } while(0);
-#define FCLOSE(ptr_) \
-    do { fclose(ptr_); ptr_ = NULL; } while(0);
-
 #endif // TOKENIZER_H

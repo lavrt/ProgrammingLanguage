@@ -11,7 +11,7 @@ enum NodeType
 struct tNode
 {
     NodeType type;
-    int value;
+    char* value;
     tNode* left;
     tNode* right;
 };
@@ -32,6 +32,7 @@ enum Operations
     Tg   = 11,
     Ctg  = 12,
     uSub = 13,
+    If   = 14,
 };
 
 const char* const keyAdd = "+"  ;
@@ -46,5 +47,7 @@ const char* const keySin = "sin";
 const char* const keyCos = "cos";
 const char* const keyTg  = "tg" ;
 const char* const keyCtg = "ctg";
+const char* const keyEnd = "end";
+const char* const keyIf  = "if" ;
 
 #endif // NODE_H
