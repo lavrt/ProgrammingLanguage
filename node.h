@@ -49,5 +49,6 @@ const char* const keyTg  = "tg" ;
 const char* const keyCtg = "ctg";
 const char* const keyEnd = "end";
 const char* const keyIf  = "if" ;
+const char* const keyWhile  = "while" ;
 
 #endif // NODE_H
