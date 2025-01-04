@@ -41,14 +41,16 @@ static tNode* getGrammar(Vector tokenVector)
     int pos = 0;
 
     tNode* leftNode = getOperation(tokenVector, &pos);
+    tNode* rightNode = nullptr;
     if (strcmp(GET_TOKEN(pos++), ";")) syntaxError(__LINE__);
     while (strcmp(GET_TOKEN(pos), keyEnd))
     {
-        tNode* rightNode = getOperation(tokenVector, &pos);
+        rightNode = getOperation(tokenVector, &pos);
         if (strcmp(GET_TOKEN(pos++), ";")) syntaxError(__LINE__);
         leftNode = newNode(Operation, ";", rightNode, leftNode);
     }
 
+    // leftNode = newNode(Operation, ";", rightNode, leftNode);
 
 
     // if (strcmp(GET_TOKEN(pos), keyEnd))
@@ -223,22 +225,34 @@ static tNode* getVariable(Vector tokenVector, int* pos)
 
 static tNode* getOperation(Vector tokenVector, int* pos)
 {
-    if (!strcmp(GET_TOKEN((*pos)++), keyIf))
+    if (!strcmp(GET_TOKEN(*pos), keyIf))
     {
+        (*pos)++;
         tNode* node = getIf(tokenVector, pos);
         // (*pos)++;
         return node;
     }
+    else if (!strcmp(GET_TOKEN(*pos), "{"))
+    {
+        (*pos)++;
+        tNode* leftNode = getOperation(tokenVector, pos);
+        if (strcmp(GET_TOKEN((*pos)++), ";")) syntaxError(__LINE__);
+        while (strcmp(GET_TOKEN(*pos), "}"))
+        {
+            tNode* rightNode = getOperation(tokenVector, pos);
+            if (strcmp(GET_TOKEN((*pos)++), ";")) syntaxError(__LINE__);
+            leftNode = newNode(Operation, ";", leftNode, rightNode);
+        }
+
+        if (strcmp(GET_TOKEN((*pos)++), "}")) syntaxError(__LINE__);
+
+        return leftNode;
+    }
     else if (!isKeyWord(GET_TOKEN(*pos)))
-    {fprintf(stderr, "____%s\n", GET_TOKEN(*pos));
+    {
         return getAssignment(tokenVector, pos);
     }
-    else
-    {
-        if (strcmp(GET_TOKEN(*pos), "{")) syntaxError(__LINE__);
-
-        if (strcmp(GET_TOKEN(*pos), "}")) syntaxError(__LINE__);
-    }
+    else syntaxError(__LINE__);
 }
 
 static tNode* getIf(Vector tokenVector, int* pos) // TODO
@@ -248,6 +262,7 @@ static tNode* getIf(Vector tokenVector, int* pos) // TODO
     tNode* leftNode = getExpression(tokenVector, pos);
     fprintf(stderr, "%s\n", GET_TOKEN(*pos)); // (*pos)++;
     CHECK_RIGHT_PARENTHESIS;
+    (*pos)++;
 
     tNode* rightNode = getOperation(tokenVector, pos);
 
