@@ -223,7 +223,7 @@ static tNode* getVariable(Vector tokenVector, int* pos)
 
 static tNode* getOperation(Vector tokenVector, int* pos)
 {
-    if (!strcmp(GET_TOKEN(*pos), keyIf))
+    if (!strcmp(GET_TOKEN((*pos)++), keyIf))
     {
         tNode* node = getIf(tokenVector, pos);
         // (*pos)++;
@@ -242,9 +242,11 @@ static tNode* getOperation(Vector tokenVector, int* pos)
 }
 
 static tNode* getIf(Vector tokenVector, int* pos) // TODO
-{
+{ fprintf(stderr, "%s\n", GET_TOKEN(*pos));
     CHECK_LEFT_PARENTHESIS;
+    (*pos)++;
     tNode* leftNode = getExpression(tokenVector, pos);
+    fprintf(stderr, "%s\n", GET_TOKEN(*pos)); // (*pos)++;
     CHECK_RIGHT_PARENTHESIS;
 
     tNode* rightNode = getOperation(tokenVector, pos);
