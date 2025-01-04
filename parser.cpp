@@ -40,14 +40,13 @@ static tNode* getGrammar(Vector tokenVector)
 {
     int pos = 0;
 
-    tNode* node = nullptr;
+    tNode* leftNode = getOperation(tokenVector, &pos);
+    if (strcmp(GET_TOKEN(pos++), ";")) syntaxError(__LINE__);
     while (strcmp(GET_TOKEN(pos), keyEnd))
     {
-        node = getOperation(tokenVector, &pos);
-        if (strcmp(GET_TOKEN(pos++), ";"))
-        {
-            syntaxError(__LINE__);
-        }
+        tNode* rightNode = getOperation(tokenVector, &pos);
+        if (strcmp(GET_TOKEN(pos++), ";")) syntaxError(__LINE__);
+        leftNode = newNode(Operation, ";", rightNode, leftNode);
     }
 
 
@@ -58,7 +57,7 @@ static tNode* getGrammar(Vector tokenVector)
     //     pos++;
     // }
 
-    return node;
+    return leftNode;
 }
 
 static tNode* getExpression(Vector tokenVector, int* pos)
