@@ -23,7 +23,7 @@ static tNode* getFunction(Vector tokenVector, int* pos);
 static tNode* getIf(Vector tokenVector, int* pos);
 static tNode* getAssignment(Vector tokenVector, int* pos);
 static tNode* getOperation(Vector tokenVector, int* pos);
-[[noreturn]] static void syntaxError();
+[[noreturn]] static void syntaxError(int line);
 
 // global --------------------------------------------------------------------------------------------------------------
 
@@ -40,13 +40,23 @@ static tNode* getGrammar(Vector tokenVector)
 {
     int pos = 0;
 
-    tNode* node = getExpression(tokenVector, &pos);
-
-    if (strcmp(GET_TOKEN(pos), keyEnd))
+    tNode* node = nullptr;
+    while (strcmp(GET_TOKEN(pos), keyEnd))
     {
-        syntaxError();
-        pos++;
+        node = getOperation(tokenVector, &pos);
+        if (strcmp(GET_TOKEN(pos++), ";"))
+        {
+            syntaxError(__LINE__);
+        }
     }
+
+
+
+    // if (strcmp(GET_TOKEN(pos), keyEnd))
+    // {  fprintf(stderr, "%s\n", GET_TOKEN(pos));
+    //     syntaxError(__LINE__);
+    //     pos++;
+    // }
 
     return node;
 }
@@ -100,7 +110,7 @@ static tNode* getParentheses(Vector tokenVector, int* pos)
         (*pos)++;
         tNode* node = getExpression(tokenVector, pos);
         if (strcmp(GET_TOKEN(*pos), ")"))
-            syntaxError();
+            syntaxError(__LINE__);
         (*pos)++;
         return node;
     }
@@ -198,7 +208,7 @@ static tNode* getFunction(Vector tokenVector, int* pos)
 //     else
 //     {
 //         FREE(GET_TOKEN(*pos));
-//         syntaxError();
+//         syntaxError(__LINE__);
 //     }
 }
 
@@ -212,37 +222,51 @@ static tNode* getVariable(Vector tokenVector, int* pos)
     return VAR(GET_TOKEN((*pos)++));
 }
 
-// static tNode* getOperation(Vector tokenVector, int* pos)
-// {
-//     if (!strcmp(GET_TOKEN(*pos), keyIf))
-//     {
-//         return getIf(tokenVector, pos);
-//     }
-//     else if (!isKeyWord(GET_TOKEN(*pos)))
-//     {
-//         getAssignment(tokenVector, pos);
-//     }
-//     else
-//     {
-//
-//     }
-// }
-//
-// static tNode* getIf(Vector tokenVector, int* pos) // TODO
-// {
-//     CHECK_LEFT_PARENTHESIS;
-//     tNode* node = getExpression(tokenVector, pos);
-//     CHECK_RIGHT_PARENTHESIS;
-// }
-//
-// static tNode* getAssignment(Vector tokenVector, int* pos) // TODO
-// {
-//
-// }
-
-static void syntaxError()
+static tNode* getOperation(Vector tokenVector, int* pos)
 {
-    fprintf(stderr, "Syntax error\n");
+    if (!strcmp(GET_TOKEN(*pos), keyIf))
+    {
+        tNode* node = getIf(tokenVector, pos);
+        // (*pos)++;
+        return node;
+    }
+    else if (!isKeyWord(GET_TOKEN(*pos)))
+    {fprintf(stderr, "____%s\n", GET_TOKEN(*pos));
+        return getAssignment(tokenVector, pos);
+    }
+    else
+    {
+        if (strcmp(GET_TOKEN(*pos), "{")) syntaxError(__LINE__);
+
+        if (strcmp(GET_TOKEN(*pos), "}")) syntaxError(__LINE__);
+    }
+}
+
+static tNode* getIf(Vector tokenVector, int* pos) // TODO
+{
+    CHECK_LEFT_PARENTHESIS;
+    tNode* leftNode = getExpression(tokenVector, pos);
+    CHECK_RIGHT_PARENTHESIS;
+
+    tNode* rightNode = getOperation(tokenVector, pos);
+
+    return newNode(Operation, "if", leftNode, rightNode);
+}
+
+static tNode* getAssignment(Vector tokenVector, int* pos) // TODO
+{
+    tNode* leftNode = getVariable(tokenVector, pos);
+    // (*pos)++;
+    fprintf(stderr, "__%s\n", GET_TOKEN(*pos));
+    if (strcmp(GET_TOKEN(*pos), "=")) syntaxError(__LINE__);
+    (*pos)++;
+    tNode* rightNode = getExpression(tokenVector, pos);
+    return newNode(Operation, "=", leftNode, rightNode);
+}
+
+static void syntaxError(int line)
+{
+    fprintf(stderr, "Syntax error in %d\n", line);
 
     exit(EXIT_FAILURE);
 }

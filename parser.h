@@ -20,9 +20,9 @@ struct Data
 #define MOVE_POS_BY_LENGTH_OF_WORD \
     do { token->pos += strlen(word); FREE(word); } while (0);
 #define CHECK_LEFT_PARENTHESIS \
-    do { if (strcmp(GET_TOKEN(*pos), "(")) syntaxError(); } while(0);
+    do { if (strcmp(GET_TOKEN(*pos), "(")) syntaxError(__LINE__); } while(0);
 #define CHECK_RIGHT_PARENTHESIS \
-    do { if (strcmp(GET_TOKEN(*pos), ")")) syntaxError(); } while(0);
+    do { if (strcmp(GET_TOKEN(*pos), ")")) syntaxError(__LINE__); } while(0);
 
 #define GET_TOKEN(pos_) \
     (((Token*)vectorGet(&tokenVector, pos_))->value)
