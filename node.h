@@ -28,23 +28,25 @@ enum Operations
     Cos   =  7,
     If    =  8,
     While =  9,
+    Semicolon = 10,
+    Equal = 11,
 };
 
-char* const keySemicolon = ";" ;
-char* const keyAdd   = "+"     ;
-char* const keySub   = "-"     ;
-char* const keyMul   = "*"     ;
-char* const keyDiv   = "/"     ;
-char* const keySin   = "sin"   ;
-char* const keyCos   = "cos"   ;
-char* const keySqrt  = "sqrt"  ;
-char* const keyEnd   = "end"   ;
-char* const keyIf    = "if"    ;
-char* const keyWhile = "while" ;
-char* const keyEqual = "="     ;
-char* const keyLeftParenthesis = "(";
-char* const keyRightParenthesis = ")";
-char* const keyLeftCurlyBracket = "{";
-char* const keyRightCurlyBracket = "}";
+const char* const keySemicolon = ";" ;
+const char* const keyAdd   = "+"     ;
+const char* const keySub   = "-"     ;
+const char* const keyMul   = "*"     ;
+const char* const keyDiv   = "/"     ;
+const char* const keySin   = "sin"   ;
+const char* const keyCos   = "cos"   ;
+const char* const keySqrt  = "sqrt"  ;
+const char* const keyEnd   = "end"   ;
+const char* const keyIf    = "if"    ;
+const char* const keyWhile = "while" ;
+const char* const keyEqual = "="     ;
+const char* const keyLeftParenthesis = "(";
+const char* const keyRightParenthesis = ")";
+const char* const keyLeftCurlyBracket = "{";
+const char* const keyRightCurlyBracket = "}";
 
 #endif // NODE_H

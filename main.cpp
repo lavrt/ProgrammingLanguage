@@ -1,3 +1,4 @@
+#include "codeGenerator.h"
 #include "vector.h"
 #include "tokenizer.h"
 #include "parser.h"
@@ -10,6 +11,8 @@ int main()
     tNode* root = runParser(a);
 
     dump(root);
+
+    runCodeGenerator(root);
 
     //_________________________________________________// //TODO func
     FREE(((Token*)vectorGet(&a, 0))->left->value);
