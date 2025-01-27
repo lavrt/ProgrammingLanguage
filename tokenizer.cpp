@@ -79,18 +79,15 @@ size_t getFileSize(FILE* file)
 
 Operations isKeyWord(const char* const word)
 {
-    if      (!strcmp(word, keyAdd)) return Add;
-    else if (!strcmp(word, keySub)) return Sub;
-    else if (!strcmp(word, keyMul)) return Mul;
-    else if (!strcmp(word, keyDiv)) return Div;
-    else if (!strcmp(word, keyDeg)) return Deg;
-    else if (!strcmp(word, keyLn )) return Ln ;
-    else if (!strcmp(word, keyLog)) return Log;
-    else if (!strcmp(word, keyLg )) return Lg ;
-    else if (!strcmp(word, keySin)) return Sin;
-    else if (!strcmp(word, keyCos)) return Cos;
-    else if (!strcmp(word, keyTg )) return Tg ;
-    else if (!strcmp(word, keyCtg)) return Ctg;
-    else if (!strcmp(word, keyIf )) return If ;
-    else                            return NoOperation;
+    if      (!strcmp(word, keyAdd  )) return Add  ;
+    else if (!strcmp(word, keySub  )) return Sub  ;
+    else if (!strcmp(word, keyMul  )) return Mul  ;
+    else if (!strcmp(word, keyDiv  )) return Div  ;
+    else if (!strcmp(word, keySqrt )) return Sqrt ;
+    else if (!strcmp(word, keySin  )) return Sin  ;
+    else if (!strcmp(word, keyCos  )) return Cos  ;
+    else if (!strcmp(word, keyIf   )) return If   ;
+    else if (!strcmp(word, keyWhile)) return While;
+
+    else return NoOperation;
 }

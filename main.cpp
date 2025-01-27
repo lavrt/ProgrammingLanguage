@@ -7,10 +7,6 @@ int main()
 {
     Vector a = tokenizer();
 
-    // fprintf(stderr, "%s\n", ((Token*)vectorGet(&a, 0))->value);
-    // fprintf(stderr, "%s\n", ((Token*)vectorGet(&a, 1))->value);
-    // fprintf(stderr, "%s\n", ((Token*)vectorGet(&a, 2))->value);
-
     tNode* root = runParser(a);
 
     dump(root);
