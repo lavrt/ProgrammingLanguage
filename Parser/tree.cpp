@@ -165,7 +165,15 @@ static void dumpTreeTraversal(tNode* node, FILE* dumpFile)
     }
     if (node->type == Operation)
     {
-        fprintf(dumpFile, " | type: %s | value: %s | ", kOperation, node->value);
+        if (!strcmp(node->value, ">" ) || !strcmp(node->value, "<" ) || !strcmp(node->value, "==") ||
+        !strcmp(node->value, ">=") || !strcmp(node->value, "<=") || !strcmp(node->value, "!="))
+        {
+            fprintf(dumpFile, " | type: %s | value: \\%s | ", kOperation, node->value);
+        }
+        else
+        {
+            fprintf(dumpFile, " | type: %s | value: %s | ", kOperation, node->value);
+        }
     }
 
     fprintf(dumpFile, "{ left: %p | right: %p }} \"", node->left, node->right);

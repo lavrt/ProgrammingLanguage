@@ -2,6 +2,7 @@
 #define TOKENIZER_H
 
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "node.h"
 #include "vector.h"
@@ -19,7 +20,7 @@ struct Token
 
 Vector tokenizer();
 size_t getFileSize(FILE* file);
-Operations isKeyWord(const char* const word);
+bool isKeyWord(const char* const word);
 void tokenVectorDtor(Vector* vec);
 
 #endif // TOKENIZER_H

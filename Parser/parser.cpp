@@ -15,6 +15,7 @@
 
 static tNode* getGrammar(Vector tokenVector);
 static tNode* getExpression(Vector tokenVector, size_t* pos);
+static tNode* getComparsion(Vector tokenVector, size_t* pos);
 static tNode* getMultiplication(Vector tokenVector, size_t* pos);
 static tNode* getParentheses(Vector tokenVector, size_t* pos);
 static tNode* getNumber(Vector tokenVector, size_t* pos);
@@ -80,6 +81,45 @@ static tNode* getExpression(Vector tokenVector, size_t* pos)
     return leftNode;
 }
 
+static tNode* getComparsion(Vector tokenVector, size_t* pos)
+{
+    tNode* leftNode = getExpression(tokenVector, pos);
+
+    if (!strcmp(GET_TOKEN(*pos), ">" ) || !strcmp(GET_TOKEN(*pos), "<" ) || !strcmp(GET_TOKEN(*pos), "==") ||
+        !strcmp(GET_TOKEN(*pos), ">=") || !strcmp(GET_TOKEN(*pos), "<=") || !strcmp(GET_TOKEN(*pos), "!="))
+    {
+        size_t op = *pos;
+        (*pos)++;
+        tNode* rightNode = getExpression(tokenVector, pos);
+        if (!strcmp(GET_TOKEN(op), ">"))
+        {
+            leftNode = newNode(Operation, ">", leftNode, rightNode);
+        }
+        else if (!strcmp(GET_TOKEN(op), "<"))
+        {
+            leftNode = newNode(Operation, "<", leftNode, rightNode);
+        }
+        else if (!strcmp(GET_TOKEN(op), "=="))
+        {
+            leftNode = newNode(Operation, "==", leftNode, rightNode);
+        }
+        else if (!strcmp(GET_TOKEN(op), "<="))
+        {
+            leftNode = newNode(Operation, "<=", leftNode, rightNode);
+        }
+        else if (!strcmp(GET_TOKEN(op), ">="))
+        {
+            leftNode = newNode(Operation, ">=", leftNode, rightNode);
+        }
+        else if (!strcmp(GET_TOKEN(op), "!="))
+        {
+            leftNode = newNode(Operation, "!=", leftNode, rightNode);
+        }
+    }
+
+    return leftNode;
+}
+
 static tNode* getMultiplication(Vector tokenVector, size_t* pos)
 {
     tNode* leftNode = getParentheses(tokenVector, pos);
@@ -106,7 +146,7 @@ static tNode* getParentheses(Vector tokenVector, size_t* pos)
     if (!strcmp(GET_TOKEN(*pos), keyLeftParenthesis))
     {
         (*pos)++;
-        tNode* node = getExpression(tokenVector, pos);
+        tNode* node = getComparsion(tokenVector, pos);
         if (strcmp(GET_TOKEN(*pos), keyRightParenthesis))
         {
             syntaxError(__LINE__);
@@ -140,7 +180,7 @@ static tNode* getFunction(Vector tokenVector, size_t* pos)
         CHECK_LEFT_PARENTHESIS;
         (*pos)++;
 
-        node->left = getExpression(tokenVector, pos);
+        node->left = getComparsion(tokenVector, pos);
 
         CHECK_RIGHT_PARENTHESIS;
         (*pos)++;
@@ -155,7 +195,7 @@ static tNode* getFunction(Vector tokenVector, size_t* pos)
         CHECK_LEFT_PARENTHESIS;
         (*pos)++;
 
-        node->left = getExpression(tokenVector, pos);
+        node->left = getComparsion(tokenVector, pos);
 
         CHECK_RIGHT_PARENTHESIS;
         (*pos)++;
@@ -170,7 +210,7 @@ static tNode* getFunction(Vector tokenVector, size_t* pos)
         CHECK_LEFT_PARENTHESIS;
         (*pos)++;
 
-        node->left = getExpression(tokenVector, pos);
+        node->left = getComparsion(tokenVector, pos);
 
         CHECK_RIGHT_PARENTHESIS;
         (*pos)++;
@@ -213,7 +253,7 @@ static tNode* getOperation(Vector tokenVector, size_t* pos)
         (*pos)++;
         CHECK_LEFT_PARENTHESIS;
         (*pos)++;
-        tNode* leftNode = getExpression(tokenVector, pos);
+        tNode* leftNode = getComparsion(tokenVector, pos);
         CHECK_RIGHT_PARENTHESIS;
         (*pos)++;
 
@@ -258,7 +298,7 @@ static tNode* getIf(Vector tokenVector, size_t* pos)
 {
     CHECK_LEFT_PARENTHESIS;
     (*pos)++;
-    tNode* leftNode = getExpression(tokenVector, pos);
+    tNode* leftNode = getComparsion(tokenVector, pos);
     CHECK_RIGHT_PARENTHESIS;
     (*pos)++;
 
@@ -271,7 +311,7 @@ static tNode* getWhile(Vector tokenVector, size_t* pos)
 {
     CHECK_LEFT_PARENTHESIS;
     (*pos)++;
-    tNode* leftNode = getExpression(tokenVector, pos);
+    tNode* leftNode = getComparsion(tokenVector, pos);
     CHECK_RIGHT_PARENTHESIS;
     (*pos)++;
 
@@ -288,7 +328,7 @@ static tNode* getAssignment(Vector tokenVector, size_t* pos)
         syntaxError(__LINE__);
     }
     (*pos)++;
-    tNode* rightNode = getExpression(tokenVector, pos);
+    tNode* rightNode = getComparsion(tokenVector, pos);
     return EQUAL(leftNode, rightNode);
 }
 

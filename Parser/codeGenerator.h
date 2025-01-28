@@ -12,6 +12,7 @@ struct codeGenerator
     tNode* node;
     size_t ifCounter;
     size_t whileCounter;
+    size_t comparsionCounter;
 
     Vector scopeTable;
     size_t nestingLevel;
@@ -20,7 +21,7 @@ struct codeGenerator
 
 struct symbol
 {
-    char* ID;
+    const char* ID;
     size_t IDAddress;
     size_t numberOfIDsInScope;
 };

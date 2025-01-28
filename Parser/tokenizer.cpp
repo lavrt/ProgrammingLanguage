@@ -29,7 +29,7 @@ Vector tokenizer()
         Token* currentToken = (Token*)calloc(1, sizeof(Token));
         assert(currentToken);
 
-        currentToken->value = pointerToWord; // (const char*)
+        currentToken->value = pointerToWord;
 
         if (tokenVector.size)
         {
@@ -84,18 +84,30 @@ size_t getFileSize(FILE* file)
     return size;
 }
 
-Operations isKeyWord(const char* const word)
+bool isKeyWord(const char* const word)
 {
-    if      (!strcmp(word, keyAdd  )) return Add  ;
-    else if (!strcmp(word, keySub  )) return Sub  ;
-    else if (!strcmp(word, keyMul  )) return Mul  ;
-    else if (!strcmp(word, keyDiv  )) return Div  ;
-    else if (!strcmp(word, keySqrt )) return Sqrt ;
-    else if (!strcmp(word, keySin  )) return Sin  ;
-    else if (!strcmp(word, keyCos  )) return Cos  ;
-    else if (!strcmp(word, keyIf   )) return If   ;
-    else if (!strcmp(word, keyWhile)) return While;
-    else if (!strcmp(word, keyPrint)) return Print;
+         if (!strcmp(word, keyIf               )) return true;
+    else if (!strcmp(word, keyAdd              )) return true;
+    else if (!strcmp(word, keySub              )) return true;
+    else if (!strcmp(word, keyMul              )) return true;
+    else if (!strcmp(word, keyDiv              )) return true;
+    else if (!strcmp(word, keyEnd              )) return true;
+    else if (!strcmp(word, keySin              )) return true;
+    else if (!strcmp(word, keyCos              )) return true;
+    else if (!strcmp(word, keySqrt             )) return true;
+    else if (!strcmp(word, keyWhile            )) return true;
+    else if (!strcmp(word, keyPrint            )) return true;
+    else if (!strcmp(word, keySemicolon        )) return true;
+    else if (!strcmp(word, keyLeftParenthesis  )) return true;
+    else if (!strcmp(word, keyRightParenthesis )) return true;
+    else if (!strcmp(word, keyLeftCurlyBracket )) return true;
+    else if (!strcmp(word, keyRightCurlyBracket)) return true;
+    else if (!strcmp(word, keyGreaterOrEqual   )) return true;
+    else if (!strcmp(word, keyNotIdentical     )) return true;
+    else if (!strcmp(word, keyLessOrEqual      )) return true;
+    else if (!strcmp(word, keyIdentical        )) return true;
+    else if (!strcmp(word, keyGreater          )) return true;
+    else if (!strcmp(word, keyLess             )) return true;
 
     else return NoOperation;
 }

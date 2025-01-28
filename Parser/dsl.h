@@ -1,6 +1,8 @@
 #ifndef DSL_H
 #define DSL_H
 
+#include "tokenizer.h"
+
 #define CHECK_LEFT_PARENTHESIS \
     do { if (strcmp(GET_TOKEN(*pos), "(")) syntaxError(__LINE__); } while(0);
 #define CHECK_RIGHT_PARENTHESIS \

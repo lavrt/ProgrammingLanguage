@@ -27,6 +27,7 @@ static void emitSin(codeGenerator* cGen);
 static void emitCos(codeGenerator* cGen);
 static void emitIf(codeGenerator* cGen);
 static void emitWhile(codeGenerator* cGen);
+static void emitGreater(codeGenerator* cGen);
 
 // global --------------------------------------------------------------------------------------------------------------
 
@@ -39,6 +40,7 @@ void runCodeGenerator(tNode* root)
         .node = root,
         .ifCounter = 0,
         .whileCounter = 0,
+        .comparsionCounter = 0,
         .scopeTable = {},
         .nestingLevel = 0,
         .freeIndex = 0,
@@ -93,6 +95,7 @@ static void generateCode(codeGenerator* cGen)
                 case Cos:       emitCos(cGen);       break;
                 case If:        emitIf(cGen);        break;
                 case While:     emitWhile(cGen);     break;
+                case Greater:   emitGreater(cGen);   break;
 
                 case NoOperation: assert(0);
                 default:          assert(0);
@@ -119,6 +122,12 @@ static Operations returnNodeValue(const char* const word)
     else if (!strcmp(word, "cos"  ))     return Cos;
     else if (!strcmp(word, "if"   ))     return If;
     else if (!strcmp(word, "while"))     return While;
+    else if (!strcmp(word, ">"    ))     return Greater;
+    else if (!strcmp(word, "<"    ))     return Less;
+    else if (!strcmp(word, "=="   ))     return Identical;
+    else if (!strcmp(word, ">="   ))     return GreaterOrEqual;
+    else if (!strcmp(word, "<="   ))     return LessOrEqual;
+    else if (!strcmp(word, "!="   ))     return NotIdentical;
 
     else return NoOperation;
 }
@@ -360,4 +369,29 @@ static void emitID(codeGenerator* cGen)
         ((symbol*)vectorGet(&cGen->scopeTable, cGen->nestingLevel))[((symbol*)vectorGet(&cGen->scopeTable, cGen->nestingLevel))->numberOfIDsInScope++].IDAddress = cGen->freeIndex;
         fprintf(cGen->codeFile, "[%lu]\n", cGen->freeIndex++);
     }
+}
+
+static void emitGreater(codeGenerator* cGen)
+{
+    assert(cGen);
+
+    tNode* node = cGen->node;
+    cGen->node = node->left;
+    if (node->left->type == Identifier)
+    {
+        fprintf(cGen->codeFile, "push ");
+    }
+    generateCode(cGen);
+    cGen->node = node->right;
+    if (node->right->type == Identifier)
+    {
+        fprintf(cGen->codeFile, "push ");
+    }
+    generateCode(cGen);
+    fprintf(cGen->codeFile, "ja FIRST_LABEL_COMPARSION_%d\n", ++cGen->comparsionCounter);
+    fprintf(cGen->codeFile, "push 0\n");
+    fprintf(cGen->codeFile, "jmp SECOND_LABEL_COMPARSION_%d\n", cGen->comparsionCounter);
+    fprintf(cGen->codeFile, "FIRST_LABEL_COMPARSION_%d:\n", cGen->comparsionCounter);
+    fprintf(cGen->codeFile, "push 1\n");
+    fprintf(cGen->codeFile, "SECOND_LABEL_COMPARSION_%d:\n", cGen->comparsionCounter);
 }
