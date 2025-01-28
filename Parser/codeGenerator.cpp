@@ -27,7 +27,7 @@ static void emitSin(codeGenerator* cGen);
 static void emitCos(codeGenerator* cGen);
 static void emitIf(codeGenerator* cGen);
 static void emitWhile(codeGenerator* cGen);
-static void emitGreater(codeGenerator* cGen);
+static void emitComparsion(codeGenerator* cGen);
 
 // global --------------------------------------------------------------------------------------------------------------
 
@@ -77,25 +77,30 @@ static void generateCode(codeGenerator* cGen)
 
     switch (cGen->node->type)
     {
-        case Number:            emitNumber(cGen);    break;
-        case Identifier:        emitID(cGen);        break;
+        case Identifier:             emitID(cGen);         break;
+        case Number:                 emitNumber(cGen);     break;
         case Operation:
         {
             switch (returnNodeValue(cGen->node->value))
             {
-                case Semicolon: emitSemicolon(cGen); break;
-                case Equal:     emitEqual(cGen);     break;
-                case Print:     emitPrint(cGen);     break;
-                case Add:       emitAdd(cGen);       break;
-                case Sub:       emitSub(cGen);       break;
-                case Mul:       emitMul(cGen);       break;
-                case Div:       emitDiv(cGen);       break;
-                case Sqrt:      emitSqrt(cGen);      break;
-                case Sin:       emitSin(cGen);       break;
-                case Cos:       emitCos(cGen);       break;
-                case If:        emitIf(cGen);        break;
-                case While:     emitWhile(cGen);     break;
-                case Greater:   emitGreater(cGen);   break;
+                case Semicolon:      emitSemicolon(cGen);  break;
+                case Equal:          emitEqual(cGen);      break;
+                case Print:          emitPrint(cGen);      break;
+                case While:          emitWhile(cGen);      break;
+                case Sqrt:           emitSqrt(cGen);       break;
+                case Add:            emitAdd(cGen);        break;
+                case Sub:            emitSub(cGen);        break;
+                case Mul:            emitMul(cGen);        break;
+                case Div:            emitDiv(cGen);        break;
+                case If:             emitIf(cGen);         break;
+                case Sin:            emitSin(cGen);        break;
+                case Cos:            emitCos(cGen);        break;
+                case Less:
+                case Greater:
+                case Identical:
+                case LessOrEqual:
+                case NotIdentical:
+                case GreaterOrEqual: emitComparsion(cGen); break;
 
                 case NoOperation: assert(0);
                 default:          assert(0);
@@ -110,24 +115,24 @@ static Operations returnNodeValue(const char* const word)
 {
     assert(word);
 
-         if (!strcmp(word, ";"    ))     return Semicolon;
-    else if (!strcmp(word, "="    ))     return Equal;
-    else if (!strcmp(word, "print"))     return Print;
-    else if (!strcmp(word, "+"    ))     return Add;
-    else if (!strcmp(word, "-"    ))     return Sub;
-    else if (!strcmp(word, "mul"  ))     return Mul;
-    else if (!strcmp(word, "/"    ))     return Div;
-    else if (!strcmp(word, "sqrt" ))     return Sqrt;
-    else if (!strcmp(word, "sin"  ))     return Sin;
-    else if (!strcmp(word, "cos"  ))     return Cos;
-    else if (!strcmp(word, "if"   ))     return If;
-    else if (!strcmp(word, "while"))     return While;
-    else if (!strcmp(word, ">"    ))     return Greater;
-    else if (!strcmp(word, "<"    ))     return Less;
-    else if (!strcmp(word, "=="   ))     return Identical;
-    else if (!strcmp(word, ">="   ))     return GreaterOrEqual;
-    else if (!strcmp(word, "<="   ))     return LessOrEqual;
-    else if (!strcmp(word, "!="   ))     return NotIdentical;
+         if (!strcmp(word, "if"   )) return If;
+    else if (!strcmp(word, "+"    )) return Add;
+    else if (!strcmp(word, "-"    )) return Sub;
+    else if (!strcmp(word, "mul"  )) return Mul;
+    else if (!strcmp(word, "/"    )) return Div;
+    else if (!strcmp(word, "sin"  )) return Sin;
+    else if (!strcmp(word, "cos"  )) return Cos;
+    else if (!strcmp(word, "sqrt" )) return Sqrt;
+    else if (!strcmp(word, "<"    )) return Less;
+    else if (!strcmp(word, "while")) return While;
+    else if (!strcmp(word, "="    )) return Equal;
+    else if (!strcmp(word, "print")) return Print;
+    else if (!strcmp(word, ">"    )) return Greater;
+    else if (!strcmp(word, ";"    )) return Semicolon;
+    else if (!strcmp(word, "=="   )) return Identical;
+    else if (!strcmp(word, "<="   )) return LessOrEqual;
+    else if (!strcmp(word, "!="   )) return NotIdentical;
+    else if (!strcmp(word, ">="   )) return GreaterOrEqual;
 
     else return NoOperation;
 }
@@ -371,7 +376,7 @@ static void emitID(codeGenerator* cGen)
     }
 }
 
-static void emitGreater(codeGenerator* cGen)
+static void emitComparsion(codeGenerator* cGen)
 {
     assert(cGen);
 
@@ -388,10 +393,21 @@ static void emitGreater(codeGenerator* cGen)
         fprintf(cGen->codeFile, "push ");
     }
     generateCode(cGen);
-    fprintf(cGen->codeFile, "ja FIRST_LABEL_COMPARSION_%d\n", ++cGen->comparsionCounter);
+    switch (returnNodeValue(node->value))
+    {
+        case Less:           fprintf(cGen->codeFile, "jb" ); break;
+        case Greater:        fprintf(cGen->codeFile, "ja" ); break;
+        case Identical:      fprintf(cGen->codeFile, "je" ); break;
+        case LessOrEqual:    fprintf(cGen->codeFile, "jbe"); break;
+        case NotIdentical:   fprintf(cGen->codeFile, "jne"); break;
+        case GreaterOrEqual: fprintf(cGen->codeFile, "jae"); break;
+
+        default: assert(0);
+    }
+    fprintf(cGen->codeFile, " FIRST_LABEL_COMPARSION_%lu\n", ++cGen->comparsionCounter);
     fprintf(cGen->codeFile, "push 0\n");
-    fprintf(cGen->codeFile, "jmp SECOND_LABEL_COMPARSION_%d\n", cGen->comparsionCounter);
-    fprintf(cGen->codeFile, "FIRST_LABEL_COMPARSION_%d:\n", cGen->comparsionCounter);
+    fprintf(cGen->codeFile, "jmp SECOND_LABEL_COMPARSION_%lu\n", cGen->comparsionCounter);
+    fprintf(cGen->codeFile, "FIRST_LABEL_COMPARSION_%lu:\n", cGen->comparsionCounter);
     fprintf(cGen->codeFile, "push 1\n");
-    fprintf(cGen->codeFile, "SECOND_LABEL_COMPARSION_%d:\n", cGen->comparsionCounter);
+    fprintf(cGen->codeFile, "SECOND_LABEL_COMPARSION_%lu:\n", cGen->comparsionCounter);
 }
