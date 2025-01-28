@@ -10,23 +10,23 @@
 
 // static --------------------------------------------------------------------------------------------------------------
 
-static void generateCode(codeGenerator* cGen);
 static Operations returnNodeValue(const char* const word);
+static void generateCode(codeGenerator* cGen);
 
-static void emitNumber(codeGenerator* cGen);
+static void emitIf(codeGenerator* cGen);
 static void emitID(codeGenerator* cGen);
-static void emitSemicolon(codeGenerator* cGen);
-static void emitEqual(codeGenerator* cGen);
-static void emitPrint(codeGenerator* cGen);
 static void emitAdd(codeGenerator* cGen);
 static void emitSub(codeGenerator* cGen);
 static void emitMul(codeGenerator* cGen);
 static void emitDiv(codeGenerator* cGen);
-static void emitSqrt(codeGenerator* cGen);
 static void emitSin(codeGenerator* cGen);
 static void emitCos(codeGenerator* cGen);
-static void emitIf(codeGenerator* cGen);
+static void emitSqrt(codeGenerator* cGen);
+static void emitEqual(codeGenerator* cGen);
+static void emitPrint(codeGenerator* cGen);
 static void emitWhile(codeGenerator* cGen);
+static void emitNumber(codeGenerator* cGen);
+static void emitSemicolon(codeGenerator* cGen);
 static void emitComparsion(codeGenerator* cGen);
 
 // global --------------------------------------------------------------------------------------------------------------
