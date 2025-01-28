@@ -14,17 +14,18 @@
 // static --------------------------------------------------------------------------------------------------------------
 
 static tNode* getGrammar(Vector tokenVector);
-static tNode* getExpression(Vector tokenVector, size_t* pos);
-static tNode* getComparsion(Vector tokenVector, size_t* pos);
-static tNode* getMultiplication(Vector tokenVector, size_t* pos);
-static tNode* getParentheses(Vector tokenVector, size_t* pos);
+static tNode* getIf(Vector tokenVector, size_t* pos);
+static tNode* getWhile(Vector tokenVector, size_t* pos);
 static tNode* getNumber(Vector tokenVector, size_t* pos);
 static tNode* getVariable(Vector tokenVector, size_t* pos);
 static tNode* getFunction(Vector tokenVector, size_t* pos);
-static tNode* getIf(Vector tokenVector, size_t* pos);
-static tNode* getWhile(Vector tokenVector, size_t* pos);
-static tNode* getAssignment(Vector tokenVector, size_t* pos);
 static tNode* getOperation(Vector tokenVector, size_t* pos);
+static tNode* getExpression(Vector tokenVector, size_t* pos);
+static tNode* getComparsion(Vector tokenVector, size_t* pos);
+static tNode* getAssignment(Vector tokenVector, size_t* pos);
+static tNode* getParentheses(Vector tokenVector, size_t* pos);
+static tNode* getMultiplication(Vector tokenVector, size_t* pos);
+
 [[noreturn]] static void syntaxError(int line);
 
 // global --------------------------------------------------------------------------------------------------------------

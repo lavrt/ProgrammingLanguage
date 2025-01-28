@@ -309,6 +309,7 @@ static void emitIf(codeGenerator* cGen)
     cGen->node = node->right;
     generateCode(cGen);
     fprintf(cGen->codeFile, "LABEL_IF_%lu:\n", cGen->ifCounter);
+    cGen->nestingLevel--;
 }
 
 static void emitWhile(codeGenerator* cGen)
@@ -331,6 +332,7 @@ static void emitWhile(codeGenerator* cGen)
     generateCode(cGen);
     fprintf(cGen->codeFile, "jmp FIRST_LABEL_WHILE_%lu\n", labelNumber);
     fprintf(cGen->codeFile, "SECOND_LABEL_WHILE_%lu:\n", labelNumber);
+    cGen->nestingLevel--;
 }
 
 static void emitNumber(codeGenerator* cGen)
