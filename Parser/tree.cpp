@@ -32,10 +32,9 @@ tNode* newNode(NodeType type, const char* value, tNode* left, tNode* right)
         break;
         case Identifier:
         {
-            assert(!left);
-            assert(!right);
-
             node = memoryAllocationForNode();
+            node->left = left;
+            node->right = right;
 
             node->type = Identifier;
         }

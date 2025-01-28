@@ -37,6 +37,7 @@ enum Operations
     LessOrEqual = 16,
     NotIdentical = 17,
     GreaterOrEqual = 18,
+    Def,
 };
 
 const char* const keyIf = "if";
@@ -45,6 +46,7 @@ const char* const keySub = "-";
 const char* const keyMul = "*";
 const char* const keyDiv = "/";
 const char* const keyLess = "<";
+const char* const keyDef = "def";
 const char* const keySin = "sin";
 const char* const keyCos = "cos";
 const char* const keyEnd = "end";

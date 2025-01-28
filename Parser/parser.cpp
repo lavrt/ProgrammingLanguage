@@ -14,6 +14,7 @@
 // static --------------------------------------------------------------------------------------------------------------
 
 static tNode* getGrammar(Vector tokenVector);
+static tNode* getDef(Vector tokenVector, size_t* pos);
 static tNode* getIf(Vector tokenVector, size_t* pos);
 static tNode* getWhile(Vector tokenVector, size_t* pos);
 static tNode* getNumber(Vector tokenVector, size_t* pos);
@@ -43,14 +44,14 @@ static tNode* getGrammar(Vector tokenVector)
 {
     size_t pos = 0;
 
-    tNode* leftNode = getOperation(tokenVector, &pos);
+    tNode* leftNode = getDef(tokenVector, &pos);
     if (strcmp(GET_TOKEN(pos++), keySemicolon))
     {
         syntaxError(__LINE__);
     }
     while (strcmp(GET_TOKEN(pos), keyEnd))
     {
-        tNode* rightNode = getOperation(tokenVector, &pos);
+        tNode* rightNode = getDef(tokenVector, &pos);
         if (strcmp(GET_TOKEN(pos++), keySemicolon))
         {
             syntaxError(__LINE__);
@@ -166,12 +167,12 @@ static tNode* getParentheses(Vector tokenVector, size_t* pos)
     }
     else if (GET_TOKEN_TYPE(*pos) == Operation)
     {
-        return  getMathFunction(tokenVector, pos);
+        return getMathFunction(tokenVector, pos);
     }
     else assert(0);
 }
 
-static tNode*  getMathFunction(Vector tokenVector, size_t* pos)
+static tNode* getMathFunction(Vector tokenVector, size_t* pos)
 {
     if (!strcmp(GET_TOKEN(*pos), keySqrt))
     {
@@ -233,6 +234,30 @@ static tNode* getNumber(Vector tokenVector, size_t* pos)
 static tNode* getVariable(Vector tokenVector, size_t* pos)
 {
     return VAR(GET_TOKEN((*pos)++));
+}
+
+static tNode* getDef(Vector tokenVector, size_t* pos)
+{
+    if (!strcmp(GET_TOKEN(*pos), keyDef))
+    {
+        (*pos)++;
+        CHECK_LEFT_PARENTHESIS;
+        (*pos)++;
+        tNode* leftNode = getVariable(tokenVector, pos);
+        while (!strcmp(GET_TOKEN(*pos), keySemicolon))
+        {
+            (*pos)++;
+            leftNode = newNode(Identifier, GET_TOKEN(*pos), leftNode, NULL);
+            (*pos)++;
+        }
+        CHECK_RIGHT_PARENTHESIS;
+        (*pos)++;
+        tNode* rightNode = getOperation(tokenVector, pos);
+        return newNode(Operation, keyDef, leftNode, rightNode);
+    }
+    tNode* leftNode = getOperation(tokenVector, pos);
+    // (*pos)++;
+    return leftNode;
 }
 
 static tNode* getOperation(Vector tokenVector, size_t* pos)

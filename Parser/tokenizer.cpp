@@ -87,6 +87,7 @@ size_t getFileSize(FILE* file)
 bool isKeyWord(const char* const word)
 {
          if (!strcmp(word, keyIf               )) return true;
+    else if (!strcmp(word, keyDef              )) return true;
     else if (!strcmp(word, keyAdd              )) return true;
     else if (!strcmp(word, keySub              )) return true;
     else if (!strcmp(word, keyMul              )) return true;
