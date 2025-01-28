@@ -6,22 +6,15 @@
 
 int main()
 {
-    Vector a = tokenizer();
+    Vector tokens = tokenizer();
 
-    tNode* root = runParser(a);
+    tNode* root = runParser(tokens);
 
     dump(root);
 
     runCodeGenerator(root);
 
-    //_________________________________________________// //TODO func
-    FREE(((Token*)vectorGet(&a, 0))->left->value);
-    FREE(((Token*)vectorGet(&a, 0))->left);
-    for (size_t i = 0; i < a.size; i++)
-    {
-        free(vectorGet(&a, i));
-    }
-    //_________________________________________________//
+    tokenVectorDtor(&tokens);
 
     treeDtor(root);
 

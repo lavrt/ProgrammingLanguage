@@ -20,5 +20,6 @@ struct Token
 Vector tokenizer();
 size_t getFileSize(FILE* file);
 Operations isKeyWord(const char* const word);
+void tokenVectorDtor(Vector* vec);
 
 #endif // TOKENIZER_H

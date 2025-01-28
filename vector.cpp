@@ -43,3 +43,11 @@ void vectorFree(Vector* vec)
     free(vec->data);
     vec->data = nullptr;
 }
+
+void freeAllocatedVectorCells(Vector* vec)
+{
+    for (size_t i = 0; i < vec->size; i++)
+    {
+        free(vectorGet(vec, i));
+    }
+}

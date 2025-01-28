@@ -14,7 +14,7 @@ static void dumpTreeTraversalWithArrows(tNode* node, FILE* dumpFile);
 
 // global --------------------------------------------------------------------------------------------------------------
 
-tNode* newNode(NodeType type, char* value, tNode* left, tNode* right)
+tNode* newNode(NodeType type, const char* value, tNode* left, tNode* right)
 {
     tNode* node = NULL;
 
@@ -61,8 +61,14 @@ void treeDtor(tNode* node)
 {
     assert(node);
 
-    if (node->left) treeDtor(node->left);
-    if (node->right) treeDtor(node->right);
+    if (node->left)
+    {
+        treeDtor(node->left);
+    }
+    if (node->right)
+    {
+        treeDtor(node->right);
+    }
 
     memset(node, 0, sizeof(tNode));
     FREE(node);
@@ -72,7 +78,7 @@ void dump(tNode* root)
 {
     assert(root);
 
-    FILE* dumpFile = fopen("dump.gv", "w"); // FIXME const
+    FILE* dumpFile = fopen(kDumpFileName, "w");
     assert(dumpFile);
 
     fprintf(dumpFile, "digraph\n");
@@ -141,7 +147,10 @@ static tNode* memoryAllocationForNode(void)
 static void dumpTreeTraversal(tNode* node, FILE* dumpFile)
 {
     assert(dumpFile);
-    if (!node) return;
+    if (!node)
+    {
+        return;
+    }
 
     static size_t rank = 0;
     fprintf(dumpFile, "    node_%p [rank=%lu,label=\" { node: %p", node, rank, node);
@@ -190,7 +199,10 @@ static void dumpTreeTraversal(tNode* node, FILE* dumpFile)
 static void dumpTreeTraversalWithArrows(tNode* node, FILE* dumpFile)
 {
     assert(dumpFile);
-    if (!node) return;
+    if (!node)
+    {
+        return;
+    }
 
     static int flag = 0;
     if (node->left)
@@ -205,6 +217,9 @@ static void dumpTreeTraversalWithArrows(tNode* node, FILE* dumpFile)
                  : fprintf(dumpFile, "    node_%p -> node_%p ", node, node->right);
         dumpTreeTraversalWithArrows(node->right, dumpFile);
     }
-    if (flag) { fprintf(dumpFile, ";\n"); }
+    if (flag)
+    {
+        fprintf(dumpFile, ";\n");
+    }
     flag = 0;
 }

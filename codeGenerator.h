@@ -25,8 +25,9 @@ struct symbol
     size_t numberOfIDsInScope;
 };
 
+const size_t SCOPE_SIZE = 64;
+const size_t INITIAL_NUMBER_OF_SCOPES = 5;
+
 void runCodeGenerator(tNode* root);
-void generateCode(codeGenerator* cGen);
-Operations returnNodeValue(const char* const word);
 
 #endif // CODEGENERATOR_H

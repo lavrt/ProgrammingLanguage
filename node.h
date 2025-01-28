@@ -11,7 +11,7 @@ enum NodeType
 struct tNode
 {
     NodeType type;
-    char* value;
+    const char* value;
     tNode* left;
     tNode* right;
 };
@@ -30,6 +30,7 @@ enum Operations
     While =  9,
     Semicolon = 10,
     Equal = 11,
+    Print = 12,
 };
 
 const char* const keySemicolon = ";" ;
@@ -48,5 +49,6 @@ const char* const keyLeftParenthesis = "(";
 const char* const keyRightParenthesis = ")";
 const char* const keyLeftCurlyBracket = "{";
 const char* const keyRightCurlyBracket = "}";
+const char* const keyPrint = "print";
 
 #endif // NODE_H

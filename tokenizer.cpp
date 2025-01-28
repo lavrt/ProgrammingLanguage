@@ -29,7 +29,7 @@ Vector tokenizer()
         Token* currentToken = (Token*)calloc(1, sizeof(Token));
         assert(currentToken);
 
-        currentToken->value = pointerToWord;
+        currentToken->value = pointerToWord; // (const char*)
 
         if (tokenVector.size)
         {
@@ -65,6 +65,13 @@ Vector tokenizer()
     return tokenVector;
 }
 
+void tokenVectorDtor(Vector* vec)
+{
+    FREE(((Token*)vectorGet(vec, 0))->left->value);
+    FREE(((Token*)vectorGet(vec, 0))->left);
+    freeAllocatedVectorCells(vec);
+}
+
 size_t getFileSize(FILE* file)
 {
     assert(file);
@@ -88,6 +95,7 @@ Operations isKeyWord(const char* const word)
     else if (!strcmp(word, keyCos  )) return Cos  ;
     else if (!strcmp(word, keyIf   )) return If   ;
     else if (!strcmp(word, keyWhile)) return While;
+    else if (!strcmp(word, keyPrint)) return Print;
 
     else return NoOperation;
 }
