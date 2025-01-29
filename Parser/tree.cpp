@@ -22,9 +22,6 @@ tNode* newNode(NodeType type, const char* value, tNode* left, tNode* right)
     {
         case Number:
         {
-            assert(!left);
-            assert(!right);
-
             node = memoryAllocationForNode();
 
             node->type = Number;
@@ -44,6 +41,15 @@ tNode* newNode(NodeType type, const char* value, tNode* left, tNode* right)
             node = memoryAllocationForNode();
 
             node->type = Operation;
+            node->left = left;
+            node->right = right;
+        }
+        break;
+        case Function:
+        {
+            node = memoryAllocationForNode();
+
+            node->type = Function;
             node->left = left;
             node->right = right;
         }
@@ -158,11 +164,11 @@ static void dumpTreeTraversal(tNode* node, FILE* dumpFile)
     {
         fprintf(dumpFile, " | type: %s | value: %s | ", kNumber, node->value);
     }
-    if (node->type == Identifier)
+    else if (node->type == Identifier)
     {
         fprintf(dumpFile, " | type: %s | value: %s | ", kVariable, node->value);
     }
-    if (node->type == Operation)
+    else if (node->type == Operation)
     {
         if (!strcmp(node->value, ">" ) || !strcmp(node->value, "<" ) || !strcmp(node->value, "==") ||
         !strcmp(node->value, ">=") || !strcmp(node->value, "<=") || !strcmp(node->value, "!="))
@@ -174,6 +180,11 @@ static void dumpTreeTraversal(tNode* node, FILE* dumpFile)
             fprintf(dumpFile, " | type: %s | value: %s | ", kOperation, node->value);
         }
     }
+    else if (node->type == Function)
+    {
+        fprintf(dumpFile, " | type: %s | value: %s | ", kFunction, node->value);
+    }
+    else assert(0);
 
     fprintf(dumpFile, "{ left: %p | right: %p }} \"", node->left, node->right);
 
@@ -181,13 +192,17 @@ static void dumpTreeTraversal(tNode* node, FILE* dumpFile)
     {
         fprintf(dumpFile, ", color = \"#DBD4FF\"];\n");
     }
-    if (node->type == Identifier)
+    else if (node->type == Identifier)
     {
         fprintf(dumpFile, ", color = \"#EBAEE6\"];\n");
     }
-    if (node->type == Operation)
+    else if (node->type == Operation)
     {
         fprintf(dumpFile, ", color = \"#E8D59E\"];\n");
+    }
+    else if (node->type == Function)
+    {
+        fprintf(dumpFile, ", color = \"#E7FFAC\"];\n");
     }
 
     if (node->left)

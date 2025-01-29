@@ -46,7 +46,11 @@ Vector tokenizer()
             serviceToken->value = dataArray;
         }
 
-        if (isKeyWord(pointerToWord))
+        if (!strcmp(pointerToWord, keyDef))
+        {
+            currentToken->type = Function;
+        }
+        else if (isKeyWord(pointerToWord))
         {
             currentToken->type = Operation;
         }
@@ -95,6 +99,7 @@ bool isKeyWord(const char* const word)
     else if (!strcmp(word, keyEnd              )) return true;
     else if (!strcmp(word, keySin              )) return true;
     else if (!strcmp(word, keyCos              )) return true;
+    else if (!strcmp(word, keyCall             )) return true;
     else if (!strcmp(word, keySqrt             )) return true;
     else if (!strcmp(word, keyLess             )) return true;
     else if (!strcmp(word, keyWhile            )) return true;

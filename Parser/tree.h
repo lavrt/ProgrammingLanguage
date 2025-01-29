@@ -14,6 +14,7 @@
 
 const char* const kDumpFileName = "dump.gv";
 
+const char* const kFunction = "def";
 const char* const kNumber = "number";
 const char* const kVariable = "variable";
 const char* const kOperation = "operation";

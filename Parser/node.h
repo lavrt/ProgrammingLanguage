@@ -6,6 +6,7 @@ enum NodeType
     Number     = 1,
     Operation  = 2,
     Identifier = 3,
+    Function   = 4,
 };
 
 struct tNode
@@ -38,6 +39,7 @@ enum Operations
     NotIdentical = 17,
     GreaterOrEqual = 18,
     Def,
+    Call,
 };
 
 const char* const keyIf = "if";
@@ -52,6 +54,7 @@ const char* const keyCos = "cos";
 const char* const keyEnd = "end";
 const char* const keyEqual = "=";
 const char* const keyGreater = ">";
+const char* const keyCall = "call";
 const char* const keySqrt = "sqrt";
 const char* const keyPrint = "print";
 const char* const keyWhile = "while";
