@@ -6,6 +6,15 @@
 #include "vector.h"
 #include "node.h"
 
+enum FUNCTION
+{
+    nonFunction,
+    functionСall,
+    functionDefinition,
+    paramsTransmission,
+    noParamsTransmission,
+};
+
 struct codeGenerator
 {
     FILE* codeFile;
@@ -17,6 +26,10 @@ struct codeGenerator
     Vector scopeTable;
     size_t nestingLevel;
     size_t freeIndex;
+
+    FUNCTION workingWith;
+    FUNCTION isParamsTransmitting;
+    Vector funcScopeTable;
 };
 
 struct symbol

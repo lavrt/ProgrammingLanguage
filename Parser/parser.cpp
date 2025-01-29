@@ -247,16 +247,18 @@ static tNode* getDef(Vector tokenVector, size_t* pos)
         CHECK_LEFT_PARENTHESIS;
         (*pos)++;
         tNode* leftNode = getVariable(tokenVector, pos);
+        tNode* node = leftNode;
         while (!strcmp(GET_TOKEN(*pos), keySemicolon))
         {
             (*pos)++;
-            leftNode = newNode(Identifier, GET_TOKEN(*pos), leftNode, NULL);
+            leftNode->left = newNode(Identifier, GET_TOKEN(*pos), NULL, NULL);
+            leftNode = leftNode->left;
             (*pos)++;
         }
         CHECK_RIGHT_PARENTHESIS;
         (*pos)++;
         tNode* rightNode = getOperation(tokenVector, pos);
-        return newNode(Function, name, leftNode, rightNode);
+        return newNode(Function, name, node, rightNode);
     }
     tNode* leftNode = getOperation(tokenVector, pos);
     return leftNode;

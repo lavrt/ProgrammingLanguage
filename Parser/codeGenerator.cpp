@@ -21,6 +21,8 @@ static void emitMul(codeGenerator* cGen);
 static void emitDiv(codeGenerator* cGen);
 static void emitSin(codeGenerator* cGen);
 static void emitCos(codeGenerator* cGen);
+static void emitDef(codeGenerator* cGen);
+static void emitCall(codeGenerator* cGen);
 static void emitSqrt(codeGenerator* cGen);
 static void emitEqual(codeGenerator* cGen);
 static void emitPrint(codeGenerator* cGen);
@@ -44,12 +46,19 @@ void runCodeGenerator(tNode* root)
         .scopeTable = {},
         .nestingLevel = 0,
         .freeIndex = 0,
+        .workingWith = nonFunction,
+        .isParamsTransmitting = noParamsTransmission,
     };
 
     vectorInit(&cGen.scopeTable, INITIAL_NUMBER_OF_SCOPES);
     symbol* symbolTable = (symbol*)calloc(SCOPE_SIZE, sizeof(symbol));
     assert(symbolTable);
     vectorPush(&cGen.scopeTable, symbolTable);
+
+    vectorInit(&cGen.funcScopeTable, INITIAL_NUMBER_OF_SCOPES);
+    symbol* funcSymbolTable = (symbol*)calloc(SCOPE_SIZE, sizeof(symbol));
+    assert(funcSymbolTable);
+    vectorPush(&cGen.funcScopeTable, funcSymbolTable);
 
     cGen.codeFile = fopen("../VirtualMachine/Assembler/asm_code_in.txt", "wb"); // FIXME const
     assert(cGen.codeFile);
@@ -62,6 +71,9 @@ void runCodeGenerator(tNode* root)
 
     freeAllocatedVectorCells(&cGen.scopeTable);
     vectorFree(&cGen.scopeTable);
+
+    freeAllocatedVectorCells(&cGen.funcScopeTable);
+    vectorFree(&cGen.funcScopeTable);
 }
 
 // static --------------------------------------------------------------------------------------------------------------
@@ -79,10 +91,12 @@ static void generateCode(codeGenerator* cGen)
     {
         case Identifier:             emitID(cGen);         break;
         case Number:                 emitNumber(cGen);     break;
+        case Function:               emitDef(cGen);        break;
         case Operation:
         {
             switch (returnNodeValue(cGen->node->value))
             {
+                case NoOperation:    emitCall(cGen);       break;
                 case Semicolon:      emitSemicolon(cGen);  break;
                 case Equal:          emitEqual(cGen);      break;
                 case Print:          emitPrint(cGen);      break;
@@ -102,8 +116,7 @@ static void generateCode(codeGenerator* cGen)
                 case NotIdentical:
                 case GreaterOrEqual: emitComparsion(cGen); break;
 
-                case NoOperation: assert(0);
-                default:          assert(0);
+                default: assert(0);
             }
             break;
         }
@@ -309,6 +322,7 @@ static void emitIf(codeGenerator* cGen)
     cGen->node = node->right;
     generateCode(cGen);
     fprintf(cGen->codeFile, "LABEL_IF_%lu:\n", cGen->ifCounter);
+    memset((symbol*)vectorGet(&cGen->funcScopeTable, cGen->nestingLevel), 0, SCOPE_SIZE * sizeof(symbol));
     cGen->nestingLevel--;
 }
 
@@ -332,6 +346,7 @@ static void emitWhile(codeGenerator* cGen)
     generateCode(cGen);
     fprintf(cGen->codeFile, "jmp FIRST_LABEL_WHILE_%lu\n", labelNumber);
     fprintf(cGen->codeFile, "SECOND_LABEL_WHILE_%lu:\n", labelNumber);
+    memset((symbol*)vectorGet(&cGen->funcScopeTable, cGen->nestingLevel), 0, SCOPE_SIZE * sizeof(symbol));
     cGen->nestingLevel--;
 }
 
@@ -346,15 +361,26 @@ static void emitID(codeGenerator* cGen)
 {
     assert(cGen);
 
+    Vector* vec = (cGen->workingWith == functionDefinition) ? &cGen->funcScopeTable : &cGen->scopeTable;
+
+    if (cGen->workingWith == functionСall)
+    {
+        fprintf(cGen->codeFile, "push ");
+    }
+    else if (cGen->workingWith == functionDefinition && cGen->isParamsTransmitting == paramsTransmission)
+    {
+        fprintf(cGen->codeFile, "pop ");
+    }
+
     int i = (int)cGen->nestingLevel;
     int j = 0;
     bool variableIsKnown = false;
 
     for (; i >= 0; i--)
     {
-        for (; ((symbol*)vectorGet(&cGen->scopeTable, (size_t)i))[j].ID; j++)
+        for (; ((symbol*)vectorGet(vec, (size_t)i))[j].ID; j++)
         {
-            if (!strcmp(((symbol*)vectorGet(&cGen->scopeTable, (size_t)i))[j].ID, cGen->node->value))
+            if (!strcmp(((symbol*)vectorGet(vec, (size_t)i))[j].ID, cGen->node->value))
             {
                 variableIsKnown = true;
                 break;
@@ -368,13 +394,19 @@ static void emitID(codeGenerator* cGen)
 
     if (variableIsKnown)
     {
-        fprintf(cGen->codeFile, "[%lu]\n", ((symbol*)vectorGet(&cGen->scopeTable, (size_t)i))[j].IDAddress);
+        fprintf(cGen->codeFile, "[%lu]\n", ((symbol*)vectorGet(vec, (size_t)i))[j].IDAddress);
     }
     else
     {
-        ((symbol*)vectorGet(&cGen->scopeTable, cGen->nestingLevel))[((symbol*)vectorGet(&cGen->scopeTable, cGen->nestingLevel))->numberOfIDsInScope++].ID = cGen->node->value;
-        ((symbol*)vectorGet(&cGen->scopeTable, cGen->nestingLevel))[((symbol*)vectorGet(&cGen->scopeTable, cGen->nestingLevel))->numberOfIDsInScope++].IDAddress = cGen->freeIndex;
+        ((symbol*)vectorGet(vec, cGen->nestingLevel))[((symbol*)vectorGet(vec, cGen->nestingLevel))->numberOfIDsInScope].ID = cGen->node->value;
+        ((symbol*)vectorGet(vec, cGen->nestingLevel))[((symbol*)vectorGet(vec, cGen->nestingLevel))->numberOfIDsInScope++].IDAddress = cGen->freeIndex;
         fprintf(cGen->codeFile, "[%lu]\n", cGen->freeIndex++);
+    }
+
+    if ((cGen->workingWith == functionСall || cGen->workingWith == functionDefinition) && cGen->node->left)
+    {
+        cGen->node = cGen->node->left;
+        generateCode(cGen);
     }
 }
 
@@ -412,4 +444,44 @@ static void emitComparsion(codeGenerator* cGen)
     fprintf(cGen->codeFile, "FIRST_LABEL_COMPARSION_%lu:\n", cGen->comparsionCounter);
     fprintf(cGen->codeFile, "push 1\n");
     fprintf(cGen->codeFile, "SECOND_LABEL_COMPARSION_%lu:\n", cGen->comparsionCounter);
+}
+
+static void emitCall(codeGenerator* cGen)
+{
+    assert(cGen);
+
+    cGen->workingWith = functionСall;
+
+    tNode* node = cGen->node;
+    cGen->node = node->left;
+    generateCode(cGen);
+    fprintf(cGen->codeFile, "jmp %s_START\n", node->value);
+    fprintf(cGen->codeFile, "%s_END:\n", node->value);
+
+    cGen->workingWith = nonFunction;
+}
+
+static void emitDef(codeGenerator* cGen)
+{
+    assert(cGen);
+
+    cGen->workingWith = functionDefinition;
+    tNode* node = cGen->node;
+    fprintf(cGen->codeFile, "jmp %s_SKIP\n", node->value);
+    fprintf(cGen->codeFile, "%s_START:\n", node->value);
+    cGen->isParamsTransmitting = paramsTransmission;
+    cGen->node = node->left;
+    generateCode(cGen);
+    cGen->isParamsTransmitting = noParamsTransmission;
+    cGen->node = node->right;
+    generateCode(cGen);
+    fprintf(cGen->codeFile, "jmp %s_END\n", node->value);
+    fprintf(cGen->codeFile, "%s_SKIP:\n", node->value);
+
+    cGen->workingWith = nonFunction;
+
+    for (size_t i = 0; i < cGen->funcScopeTable.size; i++)
+    {
+        memset((symbol*)vectorGet(&cGen->funcScopeTable, i), 0, SCOPE_SIZE * sizeof(symbol));
+    }
 }
