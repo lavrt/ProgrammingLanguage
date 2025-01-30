@@ -13,6 +13,8 @@ enum FUNCTION
     functionDefinition,
     paramsTransmission,
     noParamsTransmission,
+    defaultVector,
+    funcVector,
 };
 
 struct codeGenerator
@@ -22,6 +24,7 @@ struct codeGenerator
     size_t ifCounter;
     size_t whileCounter;
     size_t comparsionCounter;
+    size_t returnCounter;
 
     Vector scopeTable;
     size_t nestingLevel;
@@ -29,7 +32,13 @@ struct codeGenerator
 
     FUNCTION workingWith;
     FUNCTION isParamsTransmitting;
+
     Vector funcScopeTable;
+    size_t funcNestingLevel;
+
+    FUNCTION typeOfVector;
+    const char* nameOfFunc;
+
 };
 
 struct symbol

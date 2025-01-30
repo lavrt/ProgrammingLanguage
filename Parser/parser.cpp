@@ -168,6 +168,7 @@ static tNode* getParentheses(Vector tokenVector, size_t* pos)
     }
     else if (GET_TOKEN_TYPE(*pos) == Operation)
     {
+        fprintf(stderr, "_____%s\n", GET_TOKEN(*pos));
         return getMathFunction(tokenVector, pos);
     }
     else assert(0);
@@ -222,7 +223,7 @@ static tNode* getMathFunction(Vector tokenVector, size_t* pos)
     }
     else
     {
-        FREE(GET_TOKEN(*pos));
+        //FREE(GET_TOKEN(*pos));
         syntaxError(__LINE__);
     }
 }
@@ -289,23 +290,11 @@ static tNode* getOperation(Vector tokenVector, size_t* pos)
 
         return PRINT(leftNode, NULL);
     }
-    else if (!strcmp(GET_TOKEN(*pos), keyCall))
+    else if (!strcmp(GET_TOKEN(*pos), keyReturn))
     {
         (*pos)++;
-        char* name = GET_TOKEN(*pos);
-        (*pos)++;
-        CHECK_LEFT_PARENTHESIS;
-        (*pos)++;
-        tNode* leftNode = getVariable(tokenVector, pos);
-        while (!strcmp(GET_TOKEN(*pos), keySemicolon))
-        {
-            (*pos)++;
-            leftNode = newNode(Identifier, GET_TOKEN(*pos), leftNode, NULL);
-            (*pos)++;
-        }//fprintf(stderr, "%s\n", GET_TOKEN(*pos));
-        CHECK_RIGHT_PARENTHESIS;
-        (*pos)++;
-        return newNode(Operation, name, leftNode, NULL);
+        tNode* leftNode = getComparsion(tokenVector, pos);
+        return newNode(Operation, keyReturn, leftNode, NULL);
     }
     else if (!strcmp(GET_TOKEN(*pos), keyLeftCurlyBracket))
     {
@@ -318,6 +307,7 @@ static tNode* getOperation(Vector tokenVector, size_t* pos)
         while (strcmp(GET_TOKEN(*pos), keyRightCurlyBracket))
         {
             tNode* rightNode = getOperation(tokenVector, pos);
+            fprintf(stderr, "%s\n", GET_TOKEN(*pos));
             if (strcmp(GET_TOKEN((*pos)++), keySemicolon))
             {
                 syntaxError(__LINE__);
@@ -371,12 +361,34 @@ static tNode* getWhile(Vector tokenVector, size_t* pos)
 static tNode* getAssignment(Vector tokenVector, size_t* pos)
 {
     tNode* leftNode = getVariable(tokenVector, pos);
+    tNode* rightNode = NULL;
     if (strcmp(GET_TOKEN(*pos), keyEqual))
     {
         syntaxError(__LINE__);
     }
     (*pos)++;
-    tNode* rightNode = getComparsion(tokenVector, pos);
+    if (!strcmp(GET_TOKEN(*pos), keyCall))
+    {
+        (*pos)++;
+        char* name = GET_TOKEN(*pos);
+        (*pos)++;
+        CHECK_LEFT_PARENTHESIS;
+        (*pos)++;
+        tNode* leftNode = getVariable(tokenVector, pos);
+        while (!strcmp(GET_TOKEN(*pos), keySemicolon))
+        {
+            (*pos)++;
+            leftNode = newNode(Identifier, GET_TOKEN(*pos), leftNode, NULL);
+            (*pos)++;
+        }
+        CHECK_RIGHT_PARENTHESIS;
+        (*pos)++;
+        rightNode = newNode(Operation, name, leftNode, NULL);
+    }
+    else
+    {
+        rightNode = getComparsion(tokenVector, pos);
+    }
     return EQUAL(leftNode, rightNode);
 }
 

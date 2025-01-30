@@ -28,6 +28,7 @@ static void emitEqual(codeGenerator* cGen);
 static void emitPrint(codeGenerator* cGen);
 static void emitWhile(codeGenerator* cGen);
 static void emitNumber(codeGenerator* cGen);
+static void emitReturn(codeGenerator* cGen);
 static void emitSemicolon(codeGenerator* cGen);
 static void emitComparsion(codeGenerator* cGen);
 
@@ -48,6 +49,7 @@ void runCodeGenerator(tNode* root)
         .freeIndex = 0,
         .workingWith = nonFunction,
         .isParamsTransmitting = noParamsTransmission,
+        .funcNestingLevel = 0,
     };
 
     vectorInit(&cGen.scopeTable, INITIAL_NUMBER_OF_SCOPES);
@@ -98,6 +100,7 @@ static void generateCode(codeGenerator* cGen)
             {
                 case NoOperation:    emitCall(cGen);       break;
                 case Semicolon:      emitSemicolon(cGen);  break;
+                case Return:         emitReturn(cGen);     break;
                 case Equal:          emitEqual(cGen);      break;
                 case Print:          emitPrint(cGen);      break;
                 case While:          emitWhile(cGen);      break;
@@ -128,24 +131,25 @@ static Operations returnNodeValue(const char* const word)
 {
     assert(word);
 
-         if (!strcmp(word, "if"   )) return If;
-    else if (!strcmp(word, "+"    )) return Add;
-    else if (!strcmp(word, "-"    )) return Sub;
-    else if (!strcmp(word, "mul"  )) return Mul;
-    else if (!strcmp(word, "/"    )) return Div;
-    else if (!strcmp(word, "sin"  )) return Sin;
-    else if (!strcmp(word, "cos"  )) return Cos;
-    else if (!strcmp(word, "sqrt" )) return Sqrt;
-    else if (!strcmp(word, "<"    )) return Less;
-    else if (!strcmp(word, "while")) return While;
-    else if (!strcmp(word, "="    )) return Equal;
-    else if (!strcmp(word, "print")) return Print;
-    else if (!strcmp(word, ">"    )) return Greater;
-    else if (!strcmp(word, ";"    )) return Semicolon;
-    else if (!strcmp(word, "=="   )) return Identical;
-    else if (!strcmp(word, "<="   )) return LessOrEqual;
-    else if (!strcmp(word, "!="   )) return NotIdentical;
-    else if (!strcmp(word, ">="   )) return GreaterOrEqual;
+         if (!strcmp(word, "if"    )) return If;
+    else if (!strcmp(word, "+"     )) return Add;
+    else if (!strcmp(word, "-"     )) return Sub;
+    else if (!strcmp(word, "*"     )) return Mul;
+    else if (!strcmp(word, "/"     )) return Div;
+    else if (!strcmp(word, "sin"   )) return Sin;
+    else if (!strcmp(word, "cos"   )) return Cos;
+    else if (!strcmp(word, "sqrt"  )) return Sqrt;
+    else if (!strcmp(word, "<"     )) return Less;
+    else if (!strcmp(word, "while" )) return While;
+    else if (!strcmp(word, "="     )) return Equal;
+    else if (!strcmp(word, "print" )) return Print;
+    else if (!strcmp(word, "return")) return Return;
+    else if (!strcmp(word, ">"     )) return Greater;
+    else if (!strcmp(word, ";"     )) return Semicolon;
+    else if (!strcmp(word, "=="    )) return Identical;
+    else if (!strcmp(word, "<="    )) return LessOrEqual;
+    else if (!strcmp(word, "!="    )) return NotIdentical;
+    else if (!strcmp(word, ">="    )) return GreaterOrEqual;
 
     else return NoOperation;
 }
@@ -309,10 +313,13 @@ static void emitIf(codeGenerator* cGen)
 {
     assert(cGen);
 
-    cGen->nestingLevel++;
+    size_t* nestingLevel = (cGen->typeOfVector == funcVector)? &cGen->funcNestingLevel : &cGen->nestingLevel;
+    Vector* vec = (cGen->typeOfVector == funcVector) ? &cGen->funcScopeTable : &cGen->scopeTable;
+
+    (*nestingLevel)++;
     symbol* symbolTable = (symbol*)calloc(SCOPE_SIZE, sizeof(symbol));
     assert(symbolTable);
-    vectorPush(&cGen->scopeTable, symbolTable);
+    vectorPush(vec, symbolTable);
 
     tNode* node = cGen->node;
     cGen->node = node->left;
@@ -322,18 +329,22 @@ static void emitIf(codeGenerator* cGen)
     cGen->node = node->right;
     generateCode(cGen);
     fprintf(cGen->codeFile, "LABEL_IF_%lu:\n", cGen->ifCounter);
-    memset((symbol*)vectorGet(&cGen->funcScopeTable, cGen->nestingLevel), 0, SCOPE_SIZE * sizeof(symbol));
-    cGen->nestingLevel--;
+    // cGen->freeIndex -= ((symbol*)vectorGet(vec, (*nestingLevel)))->numberOfIDsInScope; // NOTE ?????????
+    memset((symbol*)vectorGet(vec, (*nestingLevel)), 0, SCOPE_SIZE * sizeof(symbol));
+    (*nestingLevel)--;
 }
 
 static void emitWhile(codeGenerator* cGen)
 {
     assert(cGen);
 
-    cGen->nestingLevel++;
+    Vector* vec = (cGen->typeOfVector == funcVector) ? &cGen->funcScopeTable : &cGen->scopeTable;
+    size_t* nestingLevel = (cGen->typeOfVector == funcVector)? &cGen->funcNestingLevel : &cGen->nestingLevel;
+
+    (*nestingLevel)++;
     symbol* symbolTable = (symbol*)calloc(SCOPE_SIZE, sizeof(symbol));
     assert(symbolTable);
-    vectorPush(&cGen->scopeTable, symbolTable);
+    vectorPush(vec, symbolTable);
 
     size_t labelNumber = ++cGen->whileCounter;
     fprintf(cGen->codeFile, "FIRST_LABEL_WHILE_%lu:\n", labelNumber);
@@ -346,8 +357,10 @@ static void emitWhile(codeGenerator* cGen)
     generateCode(cGen);
     fprintf(cGen->codeFile, "jmp FIRST_LABEL_WHILE_%lu\n", labelNumber);
     fprintf(cGen->codeFile, "SECOND_LABEL_WHILE_%lu:\n", labelNumber);
-    memset((symbol*)vectorGet(&cGen->funcScopeTable, cGen->nestingLevel), 0, SCOPE_SIZE * sizeof(symbol));
-    cGen->nestingLevel--;
+    // cGen->freeIndex -= ((symbol*)vectorGet(vec, (*nestingLevel)))->numberOfIDsInScope; // NOTE ?????????
+    ((symbol*)vectorGet(vec, (*nestingLevel)))->numberOfIDsInScope = 0;
+    memset((symbol*)vectorGet(vec, (*nestingLevel)), 0, SCOPE_SIZE * sizeof(symbol));
+    (*nestingLevel)--;
 }
 
 static void emitNumber(codeGenerator* cGen)
@@ -361,7 +374,8 @@ static void emitID(codeGenerator* cGen)
 {
     assert(cGen);
 
-    Vector* vec = (cGen->workingWith == functionDefinition) ? &cGen->funcScopeTable : &cGen->scopeTable;
+    Vector* vec = (cGen->typeOfVector == funcVector) ? &cGen->funcScopeTable : &cGen->scopeTable;
+    size_t* nestingLevel = (cGen->typeOfVector == funcVector) ? &cGen->funcNestingLevel : &cGen->nestingLevel;
 
     if (cGen->workingWith == functionСall)
     {
@@ -372,16 +386,16 @@ static void emitID(codeGenerator* cGen)
         fprintf(cGen->codeFile, "pop ");
     }
 
-    int i = (int)cGen->nestingLevel;
+    int i = (int)(*nestingLevel);
     int j = 0;
     bool variableIsKnown = false;
 
     for (; i >= 0; i--)
     {
-        for (; ((symbol*)vectorGet(vec, (size_t)i))[j].ID; j++)
+        for (;((symbol*)vectorGet(vec, (size_t)i))[j].ID;j++)
         {
             if (!strcmp(((symbol*)vectorGet(vec, (size_t)i))[j].ID, cGen->node->value))
-            {
+            {fprintf(stderr, "Нашел %s\n", cGen->node->value);
                 variableIsKnown = true;
                 break;
             }
@@ -397,9 +411,9 @@ static void emitID(codeGenerator* cGen)
         fprintf(cGen->codeFile, "[%lu]\n", ((symbol*)vectorGet(vec, (size_t)i))[j].IDAddress);
     }
     else
-    {
-        ((symbol*)vectorGet(vec, cGen->nestingLevel))[((symbol*)vectorGet(vec, cGen->nestingLevel))->numberOfIDsInScope].ID = cGen->node->value;
-        ((symbol*)vectorGet(vec, cGen->nestingLevel))[((symbol*)vectorGet(vec, cGen->nestingLevel))->numberOfIDsInScope++].IDAddress = cGen->freeIndex;
+    {fprintf(stderr, "Не нашел %s\n", cGen->node->value);
+        ((symbol*)vectorGet(vec, (*nestingLevel)))[((symbol*)vectorGet(vec, (*nestingLevel)))->numberOfIDsInScope].ID = cGen->node->value;
+        ((symbol*)vectorGet(vec, (*nestingLevel)))[((symbol*)vectorGet(vec, (*nestingLevel)))->numberOfIDsInScope++].IDAddress = cGen->freeIndex;
         fprintf(cGen->codeFile, "[%lu]\n", cGen->freeIndex++);
     }
 
@@ -455,8 +469,8 @@ static void emitCall(codeGenerator* cGen)
     tNode* node = cGen->node;
     cGen->node = node->left;
     generateCode(cGen);
-    fprintf(cGen->codeFile, "jmp %s_START\n", node->value);
-    fprintf(cGen->codeFile, "%s_END:\n", node->value);
+    fprintf(cGen->codeFile, "call %s_START\n", node->value);
+    // fprintf(cGen->codeFile, "push cx\n");
 
     cGen->workingWith = nonFunction;
 }
@@ -465,23 +479,41 @@ static void emitDef(codeGenerator* cGen)
 {
     assert(cGen);
 
+    cGen->typeOfVector = funcVector;
     cGen->workingWith = functionDefinition;
     tNode* node = cGen->node;
+    cGen->nameOfFunc = node->value;
     fprintf(cGen->codeFile, "jmp %s_SKIP\n", node->value);
     fprintf(cGen->codeFile, "%s_START:\n", node->value);
+    fprintf(cGen->codeFile, "pop cx\n");
     cGen->isParamsTransmitting = paramsTransmission;
     cGen->node = node->left;
     generateCode(cGen);
     cGen->isParamsTransmitting = noParamsTransmission;
     cGen->node = node->right;
     generateCode(cGen);
-    fprintf(cGen->codeFile, "jmp %s_END\n", node->value);
     fprintf(cGen->codeFile, "%s_SKIP:\n", node->value);
 
     cGen->workingWith = nonFunction;
+    cGen->typeOfVector = defaultVector;
 
+    size_t releasedMemoryCells = 0;
     for (size_t i = 0; i < cGen->funcScopeTable.size; i++)
     {
+        releasedMemoryCells += ((symbol*)vectorGet(&cGen->funcScopeTable, i))->numberOfIDsInScope;
+        ((symbol*)vectorGet(&cGen->funcScopeTable, i))->numberOfIDsInScope = 0;
         memset((symbol*)vectorGet(&cGen->funcScopeTable, i), 0, SCOPE_SIZE * sizeof(symbol));
     }
+    // cGen->freeIndex -= releasedMemoryCells;
+}
+
+static void emitReturn(codeGenerator* cGen)
+{
+    assert(cGen);
+
+    cGen->node = cGen->node->left;
+    generateCode(cGen);
+    fprintf(cGen->codeFile, "push cx\n");
+    fprintf(cGen->codeFile, "ret\n", cGen->nameOfFunc);
+    // cGen->nameOfFunc = NULL;
 }

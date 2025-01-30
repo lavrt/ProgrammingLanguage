@@ -40,6 +40,7 @@ enum Operations
     GreaterOrEqual = 18,
     Def,
     Call,
+    Return,
 };
 
 const char* const keyIf = "if";
@@ -60,6 +61,7 @@ const char* const keyPrint = "print";
 const char* const keyWhile = "while";
 const char* const keySemicolon = ";";
 const char* const keyIdentical = "==";
+const char* const keyReturn = "return";
 const char* const keyLessOrEqual = "<=";
 const char* const keyNotIdentical = "!=";
 const char* const keyGreaterOrEqual = ">=";

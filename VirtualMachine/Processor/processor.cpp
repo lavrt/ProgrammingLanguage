@@ -88,7 +88,7 @@ void spuRun(PROCESSOR* spu)
     assert(spu);
 
     while(spu->run)
-    {
+    {fprintf(stderr, "  %d\n", spu->code[spu->ip]);
         switch(spu->code[spu->ip])
         {
             case CMD_HLT:
@@ -186,6 +186,13 @@ void spuRun(PROCESSOR* spu)
             case CMD_JNE:
                 executeJne(spu);
                 break;
+
+            case CMD_RET:
+                {
+                    int value = pop(&spu->stack);
+                    spu->ip = value;
+                    break;
+                }
 
             default: stopExecution(spu);
         }
