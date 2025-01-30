@@ -512,7 +512,11 @@ static void emitReturn(codeGenerator* cGen)
     assert(cGen);
 
     cGen->node = cGen->node->left;
+    // cGen->isParamsTransmitting = paramsTransmission;
+    // cGen->workingWith = functionDefinition;
     generateCode(cGen);
+
+    cGen->workingWith = nonFunction;
     fprintf(cGen->codeFile, "push cx\n");
     fprintf(cGen->codeFile, "ret\n", cGen->nameOfFunc);
     // cGen->nameOfFunc = NULL;
