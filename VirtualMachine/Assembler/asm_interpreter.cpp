@@ -103,7 +103,7 @@ static void firstPass(Assembler* const ASM)
         switch (checkCommandName(string))
         {
             case NO_CMD  :    break;
-            case CMD_CALL:    ASM->current_labels.cmd_counter += 2; break;
+            case CMD_CALL:
             case CMD_PUSH:
             case CMD_POP :
             case CMD_JMP :
@@ -112,15 +112,13 @@ static void firstPass(Assembler* const ASM)
             case CMD_JBE :
             case CMD_JB  :
             case CMD_JNE :
-            case CMD_JE  :
-
-            case CMD_RET :    ASM->current_labels.cmd_counter++;
+            case CMD_JE  : ASM->current_labels.cmd_counter += 2; break;
 
             default:          ASM->current_labels.cmd_counter++;
         }
 
         if (strchr(string, ':'))
-        {fprintf(stderr, "%d\n", ASM->current_labels.cmd_counter);
+        {  fprintf(stderr, "%d\n", ASM->current_labels.cmd_counter);
             *strchr(string, ':') = '\0';
             strcpy(ASM->current_labels.labels[ASM->current_labels.number_of_labels].name, string);
             ASM->current_labels.labels[ASM->current_labels.number_of_labels].position = ASM->current_labels.cmd_counter;
@@ -129,8 +127,6 @@ static void firstPass(Assembler* const ASM)
     }
 
     FCLOSE(ASM->asm_file);
-
-    ASM->current_labels.cmd_counter = 0;
 }
 
 static void secondPass(Assembler* const ASM)
@@ -245,7 +241,6 @@ static void interpreter(Assembler* const ASM)
 
     ensureCapacityOfCodeArray(ASM);
 
-    ASM->current_labels.cmd_counter++;
     ASM->commands.code[ASM->commands.size++] = checkCommandName(ASM->cmd.instruction);
 
     switch (checkCommandName(ASM->cmd.instruction))
@@ -253,7 +248,7 @@ static void interpreter(Assembler* const ASM)
         case CMD_PUSH:    encodePush (ASM);    break;
         case CMD_POP :    encodePop  (ASM);    break;
         case CMD_IN  :    encodeIn   (ASM);    break;
-        case CMD_CALL:    encodeCall (ASM);
+        case CMD_CALL:
         case CMD_JMP :
         case CMD_JAE :
         case CMD_JA  :
@@ -261,7 +256,6 @@ static void interpreter(Assembler* const ASM)
         case CMD_JB  :
         case CMD_JNE :
         case CMD_JE  :    encodeJumps(ASM);    break;
-        case CMD_RET :    encodeRet  (ASM);    break;
 
         default: break;
     }
@@ -286,8 +280,6 @@ static void encodePush(Assembler* const ASM)
     assert(ASM);
     assert(ASM->commands.code);
 
-    ASM->current_labels.cmd_counter++;
-
     if (ASM->cmd.presence_reg)
     {
         ASM->commands.code[ASM->commands.size - 1] = setbit(CMD_PUSH, USING_REGISTER);
@@ -309,8 +301,6 @@ static void encodePop(Assembler* ASM)
 {
     assert(ASM);
     assert(ASM->commands.code);
-
-    ASM->current_labels.cmd_counter++;
 
     if (ASM->cmd.presence_reg)
     {
@@ -334,8 +324,6 @@ static void encodeIn(Assembler* const ASM)
     assert(ASM);
     assert(ASM->commands.code);
 
-    ASM->current_labels.cmd_counter++;
-
     scanf("%d", &(ASM->commands.code[ASM->commands.size++]));
 }
 
@@ -345,8 +333,6 @@ static void encodeJumps(Assembler* const ASM)
     assert(ASM->commands.code);
     assert(ASM->current_labels.labels);
 
-    ASM->current_labels.cmd_counter++;
-
     if (atoi(ASM->cmd.name_of_label))
     {
         ASM->commands.code[ASM->commands.size++] = atoi(ASM->cmd.name_of_label);
@@ -355,7 +341,7 @@ static void encodeJumps(Assembler* const ASM)
     {
         int index_of_label = labelSearch(ASM, ASM->cmd.name_of_label);
         if (index_of_label != -1)
-        {fprintf(stderr, "_____%d\n", ASM->current_labels.labels[index_of_label].position);
+        { // fprintf(stderr, "_____%d\n", ASM->current_labels.labels[index_of_label].position);
             ASM->commands.code[ASM->commands.size++] = ASM->current_labels.labels[index_of_label].position;
         }
         else
@@ -364,26 +350,6 @@ static void encodeJumps(Assembler* const ASM)
             assert(0);
         }
     }
-}
-
-static void encodeCall(Assembler* const ASM)
-{
-    assert(ASM);
-    assert(ASM->commands.code);
-
-    ASM->current_labels.cmd_counter += 3;
-
-    ASM->commands.code[ASM->commands.size - 1] = CMD_PUSH;
-    ASM->commands.code[ASM->commands.size++] = ASM->current_labels.cmd_counter;
-    ASM->commands.code[ASM->commands.size++] = CMD_JMP;
-}
-
-static void encodeRet(Assembler* const ASM)
-{
-    assert(ASM);
-    assert(ASM->commands.code);
-
-    ASM->current_labels.cmd_counter++;
 }
 
 static void displaySyntaxError(Assembler* const ASM)
