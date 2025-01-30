@@ -88,7 +88,7 @@ void spuRun(PROCESSOR* spu)
     assert(spu);
 
     while(spu->run)
-    {fprintf(stderr, "  %d\n", spu->code[spu->ip]);
+    { // fprintf(stderr, "  %d\n", spu->code[spu->ip]);
         switch(spu->code[spu->ip])
         {
             case CMD_HLT:
@@ -193,6 +193,13 @@ void spuRun(PROCESSOR* spu)
                     spu->ip = value;
                     break;
                 }
+
+            case CMD_CALL:
+            {
+                push(&spu->stack, spu->ip + 2);
+                spu->ip = (unsigned)spu->code[spu->ip + 1];
+                break;
+            }
 
             default: stopExecution(spu);
         }
@@ -313,7 +320,7 @@ static void executeDiv(PROCESSOR* spu)
     StackElem_t b = pop(&spu->stack);
     assert(a != 0);
     push(&spu->stack, b / a);
-    spu-> ip += 1;
+    spu->ip += 1;
 }
 
 static void executeSqrt(PROCESSOR* spu)
