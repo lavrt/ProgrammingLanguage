@@ -329,7 +329,6 @@ static void emitIf(codeGenerator* cGen)
     cGen->node = node->right;
     generateCode(cGen);
     fprintf(cGen->codeFile, "LABEL_IF_%lu:\n", cGen->ifCounter);
-    // cGen->freeIndex -= ((symbol*)vectorGet(vec, (*nestingLevel)))->numberOfIDsInScope; // NOTE ?????????
     memset((symbol*)vectorGet(vec, (*nestingLevel)), 0, SCOPE_SIZE * sizeof(symbol));
     (*nestingLevel)--;
 }
@@ -357,7 +356,6 @@ static void emitWhile(codeGenerator* cGen)
     generateCode(cGen);
     fprintf(cGen->codeFile, "jmp FIRST_LABEL_WHILE_%lu\n", labelNumber);
     fprintf(cGen->codeFile, "SECOND_LABEL_WHILE_%lu:\n", labelNumber);
-    // cGen->freeIndex -= ((symbol*)vectorGet(vec, (*nestingLevel)))->numberOfIDsInScope; // NOTE ?????????
     ((symbol*)vectorGet(vec, (*nestingLevel)))->numberOfIDsInScope = 0;
     memset((symbol*)vectorGet(vec, (*nestingLevel)), 0, SCOPE_SIZE * sizeof(symbol));
     (*nestingLevel)--;
@@ -395,7 +393,7 @@ static void emitID(codeGenerator* cGen)
         for (;((symbol*)vectorGet(vec, (size_t)i))[j].ID;j++)
         {
             if (!strcmp(((symbol*)vectorGet(vec, (size_t)i))[j].ID, cGen->node->value))
-            {fprintf(stderr, "Нашел %s\n", cGen->node->value);
+            {
                 variableIsKnown = true;
                 break;
             }
@@ -411,7 +409,7 @@ static void emitID(codeGenerator* cGen)
         fprintf(cGen->codeFile, "[%lu]\n", ((symbol*)vectorGet(vec, (size_t)i))[j].IDAddress);
     }
     else
-    {fprintf(stderr, "Не нашел %s\n", cGen->node->value);
+    {
         ((symbol*)vectorGet(vec, (*nestingLevel)))[((symbol*)vectorGet(vec, (*nestingLevel)))->numberOfIDsInScope].ID = cGen->node->value;
         ((symbol*)vectorGet(vec, (*nestingLevel)))[((symbol*)vectorGet(vec, (*nestingLevel)))->numberOfIDsInScope++].IDAddress = cGen->freeIndex;
         fprintf(cGen->codeFile, "[%lu]\n", cGen->freeIndex++);
@@ -514,6 +512,7 @@ static void emitReturn(codeGenerator* cGen)
     cGen->node = cGen->node->left;
     // cGen->isParamsTransmitting = paramsTransmission;
     // cGen->workingWith = functionDefinition;
+    fprintf(cGen->codeFile, "pop ");
     generateCode(cGen);
 
     cGen->workingWith = nonFunction;
