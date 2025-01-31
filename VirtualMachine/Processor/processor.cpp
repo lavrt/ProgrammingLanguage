@@ -88,7 +88,7 @@ void spuRun(PROCESSOR* spu)
     assert(spu);
 
     while(spu->run)
-    { // fprintf(stderr, "  %d\n", spu->code[spu->ip]);
+    {  // fprintf(stderr, "  %d\n", spu->code[spu->ip]);
         switch(spu->code[spu->ip])
         {
             case CMD_HLT:
@@ -190,6 +190,7 @@ void spuRun(PROCESSOR* spu)
             case CMD_RET:
                 {
                     int value = pop(&spu->stack);
+                    // fprintf(stderr, "RET %d\n", value);
                     spu->ip = value;
                     break;
                 }
@@ -197,6 +198,7 @@ void spuRun(PROCESSOR* spu)
             case CMD_CALL:
             {
                 push(&spu->stack, spu->ip + 2);
+                // fprintf(stderr, "CALL %d\n", spu->ip + 2);
                 spu->ip = (unsigned)spu->code[spu->ip + 1];
                 break;
             }

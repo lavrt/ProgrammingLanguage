@@ -512,7 +512,7 @@ static void emitReturn(codeGenerator* cGen)
     cGen->node = cGen->node->left;
     // cGen->isParamsTransmitting = paramsTransmission;
     // cGen->workingWith = functionDefinition;
-    fprintf(cGen->codeFile, "pop ");
+    fprintf(cGen->codeFile, "push ");
     generateCode(cGen);
 
     cGen->workingWith = nonFunction;

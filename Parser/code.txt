@@ -1,7 +1,19 @@
-x = 6 ;
-while ( x > 3 )
+def f ( n )
 {
-    print ( x ) ;
-    x = x - 1 ;
+    k = 1 ;
+    i = 0 ;
+    while ( i < n )
+    {
+        i = i + 1 ;
+        k = k * i ;
+        if ( n == i )
+        {
+            return k ;
+        } ;
+    } ;
 } ;
+n = 5 ;
+k = call f ( n ) ;
+print ( k ) ;
 end
+
