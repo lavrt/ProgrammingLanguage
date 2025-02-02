@@ -12,8 +12,8 @@
 
 // static --------------------------------------------------------------------------------------------------------------
 
-static const char* NAME_OF_ASM_CODE_FILE = "asm_code_in.txt";
-static const char* NAME_OF_MACHINE_CODE_FILE = "../Processor/machine_code_in.txt";
+static const char* const NAME_OF_ASM_CODE_FILE = "asm_code_in.txt";
+static const char* const NAME_OF_MACHINE_CODE_FILE = "../Processor/machine_code_in.txt";
 
 static void interpreter(Assembler* const ASM);
 static void displaySyntaxError(Assembler* const ASM);
@@ -34,8 +34,6 @@ static void encodePush(Assembler* const ASM);
 static void encodePop(Assembler* const ASM);
 static void encodeIn(Assembler* const ASM);
 static void encodeJumps(Assembler* const ASM);
-static void encodeCall(Assembler* const ASM);
-static void encodeRet(Assembler* const ASM);
 
 // global --------------------------------------------------------------------------------------------------------------
 
@@ -102,7 +100,7 @@ static void firstPass(Assembler* const ASM)
 
         switch (checkCommandName(string))
         {
-            case NO_CMD  :    break;
+            case NO_CMD  : break;
             case CMD_CALL:
             case CMD_PUSH:
             case CMD_POP :
@@ -112,13 +110,13 @@ static void firstPass(Assembler* const ASM)
             case CMD_JBE :
             case CMD_JB  :
             case CMD_JNE :
-            case CMD_JE  : ASM->current_labels.cmd_counter += 2; break;
+            case CMD_JE  : ASM->current_labels.cmd_counter++;
 
-            default:          ASM->current_labels.cmd_counter++;
+            default:       ASM->current_labels.cmd_counter++;
         }
 
         if (strchr(string, ':'))
-        {  fprintf(stderr, "%d\n", ASM->current_labels.cmd_counter);
+        {
             *strchr(string, ':') = '\0';
             strcpy(ASM->current_labels.labels[ASM->current_labels.number_of_labels].name, string);
             ASM->current_labels.labels[ASM->current_labels.number_of_labels].position = ASM->current_labels.cmd_counter;
@@ -341,7 +339,7 @@ static void encodeJumps(Assembler* const ASM)
     {
         int index_of_label = labelSearch(ASM, ASM->cmd.name_of_label);
         if (index_of_label != -1)
-        { // fprintf(stderr, "_____%d\n", ASM->current_labels.labels[index_of_label].position);
+        {
             ASM->commands.code[ASM->commands.size++] = ASM->current_labels.labels[index_of_label].position;
         }
         else

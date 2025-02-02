@@ -10,6 +10,8 @@
 
 // static --------------------------------------------------------------------------------------------------------------
 
+static const char* const ASM_CODE_FILE = "../VirtualMachine/Assembler/asm_code_in.txt";
+
 static Operations returnNodeValue(const char* const word);
 static void generateCode(codeGenerator* cGen);
 
@@ -62,7 +64,7 @@ void runCodeGenerator(tNode* root)
     assert(funcSymbolTable);
     vectorPush(&cGen.funcScopeTable, funcSymbolTable);
 
-    cGen.codeFile = fopen("../VirtualMachine/Assembler/asm_code_in.txt", "wb"); // FIXME const
+    cGen.codeFile = fopen(ASM_CODE_FILE, "wb");
     assert(cGen.codeFile);
 
     generateCode(&cGen);
@@ -468,7 +470,6 @@ static void emitCall(codeGenerator* cGen)
     cGen->node = node->left;
     generateCode(cGen);
     fprintf(cGen->codeFile, "call %s_START\n", node->value);
-    // fprintf(cGen->codeFile, "push cx\n");
 
     cGen->workingWith = nonFunction;
 }
@@ -502,7 +503,6 @@ static void emitDef(codeGenerator* cGen)
         ((symbol*)vectorGet(&cGen->funcScopeTable, i))->numberOfIDsInScope = 0;
         memset((symbol*)vectorGet(&cGen->funcScopeTable, i), 0, SCOPE_SIZE * sizeof(symbol));
     }
-    // cGen->freeIndex -= releasedMemoryCells;
 }
 
 static void emitReturn(codeGenerator* cGen)
@@ -510,13 +510,10 @@ static void emitReturn(codeGenerator* cGen)
     assert(cGen);
 
     cGen->node = cGen->node->left;
-    // cGen->isParamsTransmitting = paramsTransmission;
-    // cGen->workingWith = functionDefinition;
     fprintf(cGen->codeFile, "push ");
     generateCode(cGen);
 
     cGen->workingWith = nonFunction;
     fprintf(cGen->codeFile, "push cx\n");
-    fprintf(cGen->codeFile, "ret\n", cGen->nameOfFunc);
-    // cGen->nameOfFunc = NULL;
+    fprintf(cGen->codeFile, "ret\n");
 }

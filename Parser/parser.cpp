@@ -14,8 +14,8 @@
 // static --------------------------------------------------------------------------------------------------------------
 
 static tNode* getGrammar(Vector tokenVector);
-static tNode* getDef(Vector tokenVector, size_t* pos);
 static tNode* getIf(Vector tokenVector, size_t* pos);
+static tNode* getDef(Vector tokenVector, size_t* pos);
 static tNode* getWhile(Vector tokenVector, size_t* pos);
 static tNode* getNumber(Vector tokenVector, size_t* pos);
 static tNode* getVariable(Vector tokenVector, size_t* pos);
@@ -168,7 +168,6 @@ static tNode* getParentheses(Vector tokenVector, size_t* pos)
     }
     else if (GET_TOKEN_TYPE(*pos) == Operation)
     {
-        fprintf(stderr, "_____%s\n", GET_TOKEN(*pos));
         return getMathFunction(tokenVector, pos);
     }
     else assert(0);
@@ -307,7 +306,6 @@ static tNode* getOperation(Vector tokenVector, size_t* pos)
         while (strcmp(GET_TOKEN(*pos), keyRightCurlyBracket))
         {
             tNode* rightNode = getOperation(tokenVector, pos);
-            fprintf(stderr, "%s\n", GET_TOKEN(*pos));
             if (strcmp(GET_TOKEN((*pos)++), keySemicolon))
             {
                 syntaxError(__LINE__);
