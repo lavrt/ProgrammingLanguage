@@ -14,12 +14,31 @@ A from-scratch implementation of a custom programming language featuring lexing,
 - Integer variables and arithmetic
 - Control flow (loops, conditional statements)
 - Function definitions and calls
+- Basic I/O operations
 
 **Sample Program**:
 Factorial calculation
 ```
-
+def f ( n )
+{
+    k = 1 ;
+    i = 0 ;
+    while ( i < n )
+    {
+        i = i + 1 ;
+        k = k * i ;
+        if ( n == i )
+        {
+            return k ;
+        } ;
+    } ;
+} ;
+n = 5 ;
+k = call f ( n ) ;
+print ( k ) ;
+end
 ```
+Output: `120`
 
 ## Build Instructions
 ```bash

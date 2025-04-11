@@ -99,7 +99,9 @@ void dump(tNode* root)
 
     FCLOSE(dumpFile);
 
-    system("dot dump.gv -Tpng -o dump.png");
+    #if defined GRAPHVIZ
+        system("dot dump.gv -Tpng -o dump.png");
+    #endif
 }
 
 tNode* copyNode(tNode* node)

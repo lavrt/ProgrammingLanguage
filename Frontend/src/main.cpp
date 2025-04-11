@@ -15,6 +15,7 @@ int main()
     runCodeGenerator(root);
 
     tokenVectorDtor(&tokens);
+    free(tokens.data);
 
     treeDtor(root);
 

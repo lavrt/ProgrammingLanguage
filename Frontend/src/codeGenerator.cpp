@@ -10,7 +10,7 @@
 
 // static --------------------------------------------------------------------------------------------------------------
 
-static const char* const ASM_CODE_FILE = "../VirtualMachine/Assembler/asm_code_in.txt";
+static const char* const ASM_CODE_FILE = "../Backend/Assembler/asm_code_in.txt";
 
 static Operations returnNodeValue(const char* const word);
 static void generateCode(codeGenerator* cGen);
