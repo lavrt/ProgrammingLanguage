@@ -204,7 +204,7 @@ static void executeOut(PROCESSOR* spu)
     spu->ip += 1;
 }
 
-static void executeDump(PROCESSOR* spu) // FIXME дамп не только стека
+static void executeDump(PROCESSOR* spu) 
 {
     StackDump(&spu->stack, __FILE__, __LINE__, __func__);
     spu->ip += 1;

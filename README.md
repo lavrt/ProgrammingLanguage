@@ -44,7 +44,7 @@ Output: `120`
 ```bash
 git clone https://github.com/lavrt/ProgrammingLanguage
 cd ProgrammingLanguage
-make run
+./build.sh
 ```
 
 ## Tools Used
