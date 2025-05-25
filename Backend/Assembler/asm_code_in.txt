@@ -42,7 +42,7 @@ LABEL_IF_1:
 jmp FIRST_LABEL_WHILE_1
 SECOND_LABEL_WHILE_1:
 f_SKIP:
-push 5
+push 12
 pop [3]
 push [3]
 call f_START

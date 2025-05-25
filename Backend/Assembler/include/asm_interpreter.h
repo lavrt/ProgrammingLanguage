@@ -7,7 +7,6 @@
 #include "asm_structures.h"
 #include "instructions.h"
 
-const int ADD_SIZE_OF_CMD_ARRAY = 50;
 const int MAX_LENGTH_OF_INSTRUCTION = 50;
 
 #define FREE(ptr_) \

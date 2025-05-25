@@ -12,7 +12,7 @@ def f ( n )
         } ;
     } ;
 } ;
-n = 5 ;
+n = 12 ;
 k = call f ( n ) ;
 print ( k ) ;
 end

@@ -79,4 +79,6 @@ const char* const FX   = "fx"  ;
 const char* const GX   = "gx"  ;
 const char* const HX   = "hx"  ;
 
+const int ADD_SIZE_OF_CMD_ARRAY = 50;
+
 #endif // INSTRUCTIONS_H

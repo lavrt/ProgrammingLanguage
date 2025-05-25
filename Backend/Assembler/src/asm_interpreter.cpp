@@ -12,8 +12,8 @@
 
 // static --------------------------------------------------------------------------------------------------------------
 
-static const char* const NAME_OF_ASM_CODE_FILE = "asm_code_in.txt";
-static const char* const NAME_OF_MACHINE_CODE_FILE = "../Processor/machine_code_in.txt";
+static const char* const NAME_OF_ASM_CODE_FILE = "./Backend/Assembler/asm_code_in.txt";
+static const char* const NAME_OF_MACHINE_CODE_FILE = "./Backend/Processor/machine_code_in.txt";
 
 static void interpreter(Assembler* const ASM);
 static void displaySyntaxError(Assembler* const ASM);

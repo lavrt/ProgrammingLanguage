@@ -18,7 +18,6 @@ struct PROCESSOR
 };
 
 static const double kEpsilon = 1e-6;
-const int ADD_SIZE_OF_CMD_ARRAY = 50;
 const int AMOUNT_OF_RAM = 1024;
 
 void spuCtor(PROCESSOR* spu, FILE* data_file);
